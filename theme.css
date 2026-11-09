@@ -78,3 +78,77 @@ body>.intro-character.is-docked.spotlight-guide{z-index:70!important;opacity:1;f
 .spotlight-exit[hidden],.spotlight-scroll-hint[hidden]{display:block!important;opacity:0;visibility:hidden;translate:0 6px;transition:opacity .3s ease,translate .3s ease,visibility 0s linear .3s}
 @media(prefers-reduced-motion:no-preference){body>.intro-character.is-docked{transition:left .6s cubic-bezier(.22,1,.36,1),top .6s cubic-bezier(.22,1,.36,1)}.intro-character .speech{transition:border-color .4s ease,box-shadow .4s ease}body>.intro-character.is-docked:has(.is-dragging){transition:none}}
 @media(prefers-reduced-motion:reduce){.spotlight-window,.spotlight-window[hidden],.spotlight-exit,.spotlight-scroll-hint{transition:none!important}}
+
+/* ---- Overview: interactive intro (calm grey chrome, one brand colour, 12/14/16 radii) ---- */
+.morning-planner{--brand:#f87945;--brand-ink:#c2461a;--ink:#354153;--sub:#697383;--line:#e5e8ef;--fill:#f2f3f8;margin:8px 0 64px;padding:32px;border:1px solid var(--line);border-radius:16px;background:#fff;box-shadow:0 4px 8px #0000000d}
+.planner-head h3{font-size:26px;font-weight:700;line-height:1.38;color:var(--ink);margin:14px 0 8px}
+.planner-head>p:not(.experience-eyebrow){font-size:14px;line-height:1.57;color:var(--sub);margin:0}
+.planner-body{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:28px;margin-top:28px;align-items:start}
+.planner-form fieldset{border:0;padding:0;margin:0 0 22px}
+.planner-form legend{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.plan-sample{font-size:11px;font-weight:600;color:var(--sub);background:var(--fill);border-radius:4px;padding:2px 6px}
+.plan-chips{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.plan-tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.plan-choice{position:relative;display:block;cursor:pointer}
+.plan-choice input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.plan-choice>span{position:relative;display:flex;flex-direction:column;justify-content:center;gap:4px;min-height:48px;padding:0 12px;border:1px solid var(--line);border-radius:14px;background:#fff;color:var(--ink);text-align:center;transition:border-color .15s ease,background-color .15s ease,color .15s ease,transform .1s ease-in-out;overflow:hidden}
+.plan-choice>span:after{content:'';position:absolute;inset:0;background:rgba(20,26,36,.06);opacity:0;transition:opacity .1s ease-in-out}
+.plan-choice b{font-size:15px;font-weight:600;font-variant-numeric:tabular-nums}
+.plan-choice small{font-size:12px;color:var(--sub)}
+.plan-tiles .plan-choice>span{min-height:74px;padding:14px 16px;text-align:left;align-items:flex-start}
+.plan-choice:hover>span{border-color:#d3d8e2}
+.plan-choice:active>span{transform:scale(.96)}
+.plan-choice:active>span:after{opacity:1}
+.plan-choice input:checked+span{border-color:var(--brand);background:#fff6f1;color:var(--brand-ink)}
+.plan-choice input:checked+span small{color:#b0603d}
+.plan-choice input:focus-visible+span{outline:2px solid var(--brand);outline-offset:2px}
+.plan-result{border-radius:14px;background:var(--fill);padding:24px}
+.plan-summary-label{display:block;font-size:12px;font-weight:600;color:var(--sub)}
+.plan-summary strong{display:block;margin-top:6px;font-size:18px;line-height:1.45;color:var(--ink)}
+.plan-track{position:relative;height:6px;margin:30px 4px 26px;border-radius:3px;background:#dfe3ea}
+.plan-track-fill{position:absolute;left:0;top:0;bottom:0;width:var(--arrive,40%);border-radius:3px;background:var(--brand);transition:width .36s cubic-bezier(.2,0,0,1),background-color .24s}
+.plan-track-deadline{position:absolute;top:-7px;left:var(--deadline,60%);width:2px;height:20px;background:var(--ink);transition:left .36s cubic-bezier(.2,0,0,1)}
+.plan-track-deadline span{position:absolute;top:22px;left:50%;translate:-50% 0;font-size:10px;font-style:normal;color:var(--sub);white-space:nowrap}
+.plan-track-seed{position:absolute;top:50%;left:var(--arrive,40%);width:34px;height:34px;translate:-50% -62%;background:url(./assets/seed-front-original.png) center/contain no-repeat;transition:left .36s cubic-bezier(.2,0,0,1)}
+@media(prefers-reduced-motion:no-preference){.plan-track-seed{animation:plan-seed-hop .9s ease-in-out infinite}@keyframes plan-seed-hop{50%{translate:-50% -78%}}}
+.morning-planner[data-tone=late] .plan-track-fill{background:#c9cfd9}
+.plan-timeline{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.plan-timeline li{display:grid;grid-template-columns:56px 1fr;gap:10px;align-items:baseline;padding:8px 0;font-size:14px;color:var(--ink);border-bottom:1px solid #e5e8ef99}
+.plan-timeline li:last-child{border-bottom:0}
+.plan-timeline time,.plan-timeline span{display:inline-block}
+.plan-timeline time{font-weight:600;font-variant-numeric:tabular-nums}
+.plan-timeline .is-deadline{color:var(--sub)}
+.plan-status{margin-top:14px;padding:14px 16px;border-radius:12px;background:#fff;border:1px solid var(--line);transition:border-color .24s,background-color .24s}
+.plan-status p{margin:0;font-size:14px;line-height:1.57;color:var(--ink);font-weight:600}
+.plan-status[data-tone=tight]{border-color:#f6cfb5;background:#fffaf6}
+.plan-status[data-tone=late]{border-color:#f3b9a3;background:#fff4ef}
+.plan-status[data-tone=late] p{color:#b3401a}
+.plan-widen{margin-top:10px;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:12px;padding:10px 14px;font:600 13px Pretendard,sans-serif;cursor:pointer;transition:transform .1s ease-in-out}
+.plan-widen:active{transform:scale(.96);background:#f6f7fa}
+.plan-cta{display:flex;justify-content:center;align-items:center;gap:14px;margin-top:16px;height:52px;border-radius:14px;background:var(--brand);color:#2b211c;font-size:16px;font-weight:600;text-decoration:none;position:relative;overflow:hidden;transition:transform .1s ease-in-out}
+.plan-cta:after{content:'';position:absolute;inset:0;background:rgba(242,243,248,.5);opacity:0;transition:opacity .1s ease-in-out}
+.plan-cta:active{transform:scale(.96)}.plan-cta:active:after{opacity:1}
+.plan-note{margin:10px 0 0;font-size:12px;color:var(--sub);text-align:center}
+/* Principles as expandable rows */
+.principles{display:flex;flex-direction:column;gap:0;border-top:1px solid #e5e8ef}
+.principle-row{border-bottom:1px solid #e5e8ef}
+.principle-row summary{list-style:none;display:grid;grid-template-columns:36px 1fr 20px;gap:12px;align-items:center;padding:18px 16px;margin:4px -8px;border-radius:0;cursor:pointer;transition:background-color .1s ease-in-out,border-radius .2s ease}
+.principle-row summary::-webkit-details-marker{display:none}
+.principle-row summary:hover{background:#f7f8fa;border-radius:14px}
+.principle-row summary:active{background:rgba(20,26,36,.06);border-radius:14px}
+.principle-index{font-size:12px;font-weight:600;color:#c2461a;font-variant-numeric:tabular-nums}
+.principle-title{display:flex;flex-direction:column;gap:4px;font-size:16px;font-weight:600;color:#354153}
+.principle-title small{font-size:12px;font-weight:500;color:#697383}
+.principle-row summary i{font-style:normal;color:#929aaa;transition:rotate .24s cubic-bezier(.2,0,0,1)}
+.principle-row[open] summary i{rotate:45deg}
+.principle-body{overflow:hidden}
+.principle-body p{margin:0;padding:0 16px 20px 56px;font-size:14px;line-height:1.7;color:#697383}
+@media(max-width:900px){.planner-body{grid-template-columns:1fr}}
+@media(max-width:760px){.morning-planner{padding:22px 18px;margin-bottom:44px}.planner-head h3{font-size:22px}.plan-chips{gap:6px}.plan-choice b{font-size:14px}.plan-result{padding:18px}.principle-body p{padding-left:16px}}
+@media(prefers-reduced-motion:reduce){.plan-choice>span,.plan-track-fill,.plan-track-deadline,.plan-track-seed,.plan-cta,.plan-widen,.principle-row summary,.principle-row summary i{transition:none;animation:none}}
+/* Pressed feedback on existing step buttons */
+.service-steps button{transition:background .2s,border-color .2s,color .2s,transform .1s ease-in-out}
+.service-steps button:active{transform:scale(.97)}
+details.principle-row[open] summary span,.principle-row summary span{transform:none;font-size:inherit;color:inherit}
+details.principle-row summary .principle-index{font-size:12px;color:#c2461a}
+.principle-row[open] summary{color:#354153}
