@@ -1,0 +1,11 @@
+{
+  "name": "ringout-demo-day",
+  "version": "0.1.0",
+  "private": true,
+  "description": "RingOut demo day static landing page",
+  "scripts": {
+    "dev": "python3 -m http.server 5173 --bind 127.0.0.1",
+    "check": "node --check app.js",
+    "build": "node build.mjs"
+  }
+}

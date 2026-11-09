@@ -1,0 +1,15 @@
+dist/
+.DS_Store
+node_modules/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+.aws/
+credentials.json
+*service-account*.json
+*.log
