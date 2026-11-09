@@ -1,8 +1,11 @@
 import { mkdir, copyFile } from 'node:fs/promises';
 await mkdir('dist/assets', { recursive: true });
-for (const file of ['index.html', 'styles.css', 'app.js', 'favicon.svg', 'forest3d.js']) await copyFile(file, `dist/${file}`);
+for (const file of ['index.html', 'styles.css', 'app.js', 'favicon.svg', 'forest3d.js', 'theme.css', 'effects.js', 'service.js']) await copyFile(file, `dist/${file}`);
 await copyFile('assets/smiling-seed-transparent.webm', 'dist/assets/smiling-seed-transparent.webm');
 for (const name of ['sunleaf', 'pine', 'oak']) await copyFile(`assets/garden-${name}.png`, `dist/assets/garden-${name}.png`);
 await copyFile('assets/three.module.js', 'dist/assets/three.module.js');
 for (const name of ['seed-back-v1.png', 'seed-front-original.png']) await copyFile(`assets/${name}`, `dist/assets/${name}`);
+await copyFile('assets/PretendardVariable.woff2', 'dist/assets/PretendardVariable.woff2');
+await copyFile('assets/Pretendard-LICENSE.txt', 'dist/assets/Pretendard-LICENSE.txt');
+for (const name of ['ringout-mockup-alarm-setting.png','ringout-mockup-alarm-screen.png','ringout-mockup-destination-in-progress.png','ringout-group-activity.png','ringout-records-daily.png','ringout-records-calendar.png']) await copyFile(`assets/${name}`, `dist/assets/${name}`);
 console.log('Static site built in dist/');

@@ -28,7 +28,7 @@ http://127.0.0.1:5173 에서 확인합니다. Python 3와 Node.js가 필요합�
 초기 측정 오류가 있던 모임 실험은 성과 수치에서 제외하고 측정 개선 과정만 설명합니다.
 서비스 설명은 기존 https://www.ringout.my/ 를 참고했습니다.
 Three.js로 숲의 원근 이동과 나무 상단 흔들림을 렌더링합니다. 서버 API는 사용하지 않습니다.
-Google Fonts가 연결되지 않으면 시스템 sans-serif 글꼴로 표시됩니다.
+Pretendard Variable을 로컬 assets에서 제공합니다. 글꼴 라이선스는 assets/Pretendard-LICENSE.txt에 포함되어 있습니다.
 
 ## EC2 + Nginx
 
@@ -54,3 +54,7 @@ HTTPS 인증서는 실제 도메인과 배포 환경에서 별도 설정합니�
 - 안내 캐릭터·말풍선·버튼은 함께 드래그되며, 조작 종료 10초 뒤 지정 위치로 복귀합니다.
 - `forest3d.js`: Three.js 장면 및 씨앗 이동·점프. `assets/three.module.js`: Three.js 0.170.0.
 - `.env`, 인증서·개인키, 의존성 및 빌드 산출물은 Git에서 제외합니다. 브라우저에 비밀값을 넣지 마세요.
+
+## 주황색 제품 디자인
+
+제공된 SOCAR 디자인 참고 문서의 흰 배경·회색 본문·Pretendard·12/14/16px 모서리 원칙을 링아웃 주황색으로 적용했습니다. theme.css가 제품 UI 디자인을 관리하며, 기존 숲과 캐릭터 동작은 유지합니다.

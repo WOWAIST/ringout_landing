@@ -46,6 +46,9 @@ function renderEntrance() {
   const travel = reducedMotion.matches ? 1 : Math.max(0, Math.min(1, (progress - .25) / .60));
   const arrival = Math.max(0, Math.min(1, (travel - .65) / .35));
   entrance.style.setProperty('--travel', travel);
+  // Spring turns to autumn while the seed walks to the destination.
+  const seasonLinear = Math.max(0, Math.min(1, (travel - .08) / .8));
+  entrance.style.setProperty('--season', seasonLinear * seasonLinear * (3 - 2 * seasonLinear));
   document.body.classList.toggle('seed-on-path', travel > .02 && entrance.getBoundingClientRect().bottom >= window.innerHeight - 2);
   document.body.classList.toggle('seed-arrived', travel >= .94);
   entrance.style.setProperty('--arrival', arrival);
@@ -100,7 +103,7 @@ guideToggle.addEventListener('click', () => {
 });
 guide.append(guideToggle);
 const guideMessages = {
-  intro: ['안녕, 난 링아웃의 작은 씨앗!', '눈만 뜨지 말고, 우리 같이 움직여볼까?', '스크롤하면 내 뒤의 문이 열려. 끝까지 함께할게!'],
+  intro: ['안녕, 난 링아웃의 작은 씨앗!', '우리 같이 움직여볼까?'],
   hero: ['링아웃을 소개할게', '알람을 끄는 것에서, 실제로 움직이는 것으로.', '목표 지점에 도착하는 아침을 만들어봐.'],
   journey: ['이렇게 시작하면 돼', '목표를 정하고, 출발하고, 도착!', '오늘 밤의 계획을 내일의 첫 행동으로 이어봐.'],
   overview: ['우리가 시작한 질문', '눈을 떴는데, 왜 아직 침대일까?', '링아웃이 기상 이후의 행동에 집중한 이유야.'],
@@ -165,6 +168,7 @@ function updateGuide(progress) {
     const storyNote = document.querySelector('.story .inline-guide-copy');
     if (storyNote && ['overview', 'hypotheses', 'tech'].includes(key)) storyNote.textContent = `${title} ${body}`;
   }
+  window.updateResearchGuide?.(key, dock);
 }
 document.querySelector('.tabs').addEventListener('click', queueEntrance);
 document.querySelector('.tabs').addEventListener('keydown', queueEntrance);
@@ -179,7 +183,7 @@ seedVideo.replaceWith(dragHandle);
 dragHandle.append(seedVideo);
 const dragHint = document.createElement('span');
 dragHint.className = 'drag-hint';
-dragHint.textContent = '나를 드래그해봐 · 10초 뒤 제자리로';
+dragHint.textContent = '나를 누르면 설명해줄게!';
 guide.append(dragHint);
 const portal = document.createElement('div');
 portal.className = 'seed-portal';
