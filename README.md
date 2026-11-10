@@ -1,7 +1,7 @@
 # RingOut Demo Day
 
 기존 서비스 랜딩과 별도로 사용하는 데모데이용 정적 페이지입니다.
-HTML, CSS, Vanilla JavaScript로 구성되어 의존성 설치와 빌드가 필요 없습니다.
+HTML, CSS, Vanilla JavaScript로 구성되어 의존성 설치 없이 빌드할 수 있습니다.
 
 ## 로컬 실행
 
@@ -9,19 +9,24 @@ HTML, CSS, Vanilla JavaScript로 구성되어 의존성 설치와 빌드가 필�
 npm run dev
 ```
 
+`npm run dev`는 빌드 후 dist를 제공합니다. 콘텐츠 수정 후 명령을 다시 실행하세요.
 http://127.0.0.1:5173 에서 확인합니다. Python 3와 Node.js가 필요합니다.
 문법 확인: `npm run check`
 
 ## 파일
 
-- `index.html`: 소개, 서비스 이야기, 가설 검증, 기술적 도전 콘텐츠
+- `index.html`: 공통 페이지 구조와 섹션 포함 위치
+- `sections/service-story.html`: 서비스 이야기
+- `sections/hypothesis-validation.html`: 가설 검증
+- `sections/technical-challenges.html`: 기술적 도전
+- `build.mjs`: 섹션을 합쳐 정적 배포 HTML 생성
 - `styles.css`: 주황색 브랜드 디자인, 모바일 레이아웃
 - `app.js`: 탭 전환, 방향키/Home/End 탐색, URL 탭 상태
 - `favicon.svg`: 데모 페이지 아이콘
 - `nginx.conf.example`: EC2 배포용 Nginx 설정 예시
 
 `?tab=hypotheses#story`, `?tab=tech#story`로 특정 탭을 공유할 수 있습니다.
-가설 검증 탭은 팀이 공유한 실제 실험 기록을 반영했습니다. 기술적 도전 탭은 아직 가상 사례입니다.
+가설 검증 탭은 팀이 공유한 실제 실험 기록을 반영했습니다. 기술적 도전 탭에는 가상 사례와 iOS 잠금 화면 알람 해제·미션 복구 사례가 함께 있습니다. iOS 사례에는 개발 검증 빌드와 이후 설정 적용 빌드에서 각각 확인한 범위를 명시했습니다.
 오전 사용 관측은 이벤트 단위의 기술적 결과이며 사용자 비율이나 사용 목적을 뜻하지 않습니다.
 모임 비교는 33/51건과 2/7건의 초기 관측으로, 인과관계나 통계적 유의성을 주장하지 않습니다.
 기록 중 미참여 성공률 13.2%는 원수치 2/7건과 맞지 않아 28.6%를 사용했습니다.

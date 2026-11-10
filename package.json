@@ -4,7 +4,7 @@
   "private": true,
   "description": "RingOut demo day static landing page",
   "scripts": {
-    "dev": "python3 -m http.server 5173 --bind 127.0.0.1",
+    "dev": "node build.mjs && python3 -m http.server 5173 --bind 127.0.0.1 --directory dist",
     "check": "node --check app.js",
     "build": "node build.mjs"
   }

@@ -1,0 +1,22 @@
+<div id="panel-tech" role="tabpanel" aria-labelledby="tab-tech" tabindex="0" hidden><div class="panel-intro"><h3>당연한 아침 뒤, 당연하지 않은 기술.</h3><p>정해진 순간에 울리고, 이동을 확인하고, 신뢰할 수 있도록.</p></div><div class="tech-list"><article><div class="tech-number">01</div><div><span class="pill">RELIABILITY · 가상 사례</span><h3>같은 시각에 몰리는 알람 요청</h3><p>오전 7시, 동시에 시작되는 하루. 요청이 몰려도 미션이 안정적으로 시작되도록 처리 경로를 개선했어요.</p><details><summary>문제와 해결 과정 보기 <span>＋</span></summary><div class="tech-detail"><p><b>문제</b> 정각에 집중된 요청으로 응답 지연과 중복 미션이 발생하는 상황을 가정했어요.</p><p><b>접근</b> 중복 요청 처리 기준과 DB 인덱스를 점검하고, 부하 테스트로 병목을 확인했어요.</p><p><b>가상 결과</b> 동일한 테스트 조건에서 p95 응답 시간 820ms → 190ms. 실제 환경에서는 재측정이 필요해요.</p></div></details></div><span class="tech-symbol" aria-hidden="true">↗</span></article><article><div class="tech-number">02</div><div><span class="pill">LOCATION · 가상 사례</span><h3>“도착”을 판단하는 정확한 기준</h3><p>GPS는 언제나 정확하지 않으니까. 위치 오차와 배터리 사용량 사이에서 도착 판정 기준을 고민했어요.</p><details><summary>문제와 해결 과정 보기 <span>＋</span></summary><div class="tech-detail"><p><b>문제</b> 실내와 고층 건물 주변의 위치 오차로 잘못된 도착 판정이 생기는 상황이에요.</p><p><b>접근</b> 위치 정확도와 연속 측정값을 함께 검토하고, 이동 중에만 측정 주기를 조정하는 방식을 실험했어요.</p><p><b>다음 검증</b> 기기·장소별 오탐률과 배터리 소모량을 함께 측정할 계획이에요.</p></div></details></div><span class="tech-symbol" aria-hidden="true">⌖</span></article><article><div class="tech-number">03</div><div><span class="pill">OBSERVABILITY · 가상 사례</span><h3>문제가 생겼을 때, 원인을 찾을 수 있도록</h3><p>미션 시작부터 도착까지의 흐름을 연결해, 사용자 경험 뒤에 숨은 오류를 추적하는 구조를 고민했어요.</p><details><summary>문제와 해결 과정 보기 <span>＋</span></summary><div class="tech-detail"><p><b>문제</b> 여러 처리 단계에 나뉜 로그만으로는 실패한 요청의 흐름을 파악하기 어려웠어요.</p><p><b>접근</b> 요청 식별자로 로그를 연결하고 지연·실패 지표를 대시보드에서 확인하는 예시를 구성했어요.</p><p><b>다음 검증</b> 장애 재현 시나리오로 탐지와 원인 파악에 걸리는 시간을 확인해요.</p></div></details></div><span class="tech-symbol" aria-hidden="true">≋</span></article>
+<article>
+  <div class="tech-number">04</div>
+  <div>
+    <span class="pill">iOS · 잠금 화면과 미션 복구</span>
+    <h3>iOS 잠금 화면에서 알람을 꺼도 미션이 이어지게 만들기</h3>
+    <p>알람 소리가 멈춘 순간부터 미션이 시작되도록. 잠금 해제를 취소해도 해제 기록과 재울림 예약이 남도록 실행 순서를 바꿨어요.</p>
+    <details>
+      <summary>문제와 해결 과정 보기 <span>＋</span></summary>
+      <div class="tech-detail">
+        <p><b>문제</b> RingOut에서 알람 끄기는 소리를 멈추고 목적지 도착 미션을 시작하는 동작이에요. 하지만 잠금 화면에서 알람을 중지한 뒤 잠금 해제를 취소하면, 소리만 멈추고 해제 시각 기록·미션 시작·재울림 예약은 빠졌어요.</p>
+        <p><b>원인</b> 알람 소리는 아이폰의 AlarmKit이 멈추지만, 미션 시작은 RingOut의 <code>StopAlarmIntent</code>가 처리해요. 기존 <code>.foreground(.immediate)</code> 설정은 앱을 먼저 열고 작업을 실행해서, 사용자가 잠금을 풀지 않으면 해제 시각을 기록하는 코드까지 도달하지 못했어요.</p>
+        <p><b>해결 ① 해제 기록을 먼저 저장</b> StopAlarmIntent를 백그라운드에서 먼저 실행하도록 바꿨어요. 어떤 알람을 언제 껐는지, 목적지와 도착 기한은 무엇인지 복구 저널 파일에 남겨 나중에 앱을 열어도 이어갈 수 있게 했어요.</p>
+        <p><b>해결 ② 앱을 열기 전에 재울림 예약</b> 해제 시각으로 도착 기한을 계산하고 AlarmKit에 재울림을 예약해요. 예약 결과를 확인한 뒤 앱 열기를 요청하므로, 잠금 해제를 취소해도 해제 기록과 성공한 예약이 남아요. 예약에 실패한 경우에도 해제 기록과 실패 상태를 저장해요.</p>
+        <p><b>해결 ③ 원래 시각으로 미션 복구</b> 오전 7시에 알람을 끄고 도착까지 10분이 주어졌다면, 7시 4분에 앱을 열었을 때 남은 시간은 6분이에요. 저장된 기록으로 해제 내역을 반영하고, 기한을 새로 세거나 재울림을 중복 예약하지 않아요.</p>
+        <p><b>실기기 확인</b> 개발 검증 빌드에서는 잠금 해제를 취소해도 재울림이 울리는 것을 확인했어요. 이후 앱을 나중에 여는 설정을 적용한 빌드에서는 잠금을 풀면 RingOut이 자동으로 열리는 것을 확인했어요.</p>
+      </div>
+    </details>
+  </div>
+  <span class="tech-symbol" aria-hidden="true">↻</span>
+</article>
+</div></div>

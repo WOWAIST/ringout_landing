@@ -11,7 +11,7 @@ let serviceIndex=0;
 let serviceExplaining=false;
 const section=document.createElement('section');section.className='app-experience';section.setAttribute('aria-label','앱 화면으로 보는 링아웃');
 section.innerHTML=`<div class="experience-copy"><p class="experience-eyebrow">FROM PLAN TO ACTION</p><h3>오늘 밤의 계획이<br>내일 아침의 첫 행동으로.</h3><p class="experience-lead">실제 앱 화면을 따라 링아웃의 하루를 만나보세요.</p><div class="service-steps" role="group" aria-label="서비스 이용 단계"></div></div><div class="app-showcase"><div class="showcase-top"><span class="service-progress">01 / 06</span><span>RINGOUT APP</span></div><div class="phone-view"><img src="" alt="" width="420" height="840"></div><div class="screen-caption" aria-live="polite"><h4></h4><p></p></div><div class="screen-navigation"><button type="button" class="screen-prev" aria-label="이전 앱 화면">←</button><div class="screen-dots" aria-hidden="true"></div><button type="button" class="screen-next" aria-label="다음 앱 화면">→</button></div></div>`;
-servicePanel.prepend(section);
+servicePanel.querySelector('#service-experience-slot').append(section);
 const buttons=section.querySelector('.service-steps');
 serviceSteps.forEach((step,index)=>{
  const button=document.createElement('button');button.type='button';button.innerHTML=`<span>${String(index+1).padStart(2,'0')}</span>${step.label}<i aria-hidden="true">↗</i>`;
@@ -180,8 +180,8 @@ window.updateResearchGuide=(key,dock)=>{currentLightGuide?.(key,dock);lightHint.
 new MutationObserver(()=>{lightHint.hidden=spotlight.hidden;}).observe(spotlight,{attributes:true,attributeFilter:['hidden']});
 
 const film=document.createElement('section');film.className='service-film';film.setAttribute('aria-label','링아웃 소개 영상');
-film.innerHTML='<div class="film-copy"><p class="experience-eyebrow">RINGOUT ON FILM</p><h3>링아웃을<br>영상으로 만나보세요.</h3><p>우리의 이야기를 조금 더 가까이.</p><a href="https://www.instagram.com/p/De8mG10Pd_j/" target="_blank" rel="noopener noreferrer">인스타그램에서 보기 ↗</a></div><div class="instagram-frame"><iframe src="https://www.instagram.com/p/De8mG10Pd_j/embed/" title="링아웃 인스타그램 소개 영상" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe><p>영상이 보이지 않으면 <a href="https://www.instagram.com/p/De8mG10Pd_j/" target="_blank" rel="noopener noreferrer">인스타그램에서 열어보세요 ↗</a></p></div>';
-section.after(film);
+film.innerHTML='<div class="film-copy"><p class="experience-eyebrow">RINGOUT ON FILM</p><h3>내일 아침 운동을<br>시작하고 싶다면</h3><ol class="story-usage-steps"><li>운동하러 갈 장소를 목적지로 정합니다.</li><li>출발을 준비할 시간과 반복 알람 간격을 설정합니다.</li><li>알람이 울리면 준비를 마치고 목적지로 이동합니다.</li><li>목적지에 도착하면 도착을 확인하고 알람을 종료합니다.</li></ol><p>운동뿐 아니라 도서관에서 공부를 시작하거나 정해진 장소로 이동해야 할 때도 활용할 수 있습니다.</p><a href="https://www.instagram.com/p/De8mG10Pd_j/" target="_blank" rel="noopener noreferrer">인스타그램에서 보기 ↗</a></div><div class="instagram-frame"><iframe src="https://www.instagram.com/p/De8mG10Pd_j/embed/" title="링아웃 인스타그램 소개 영상" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe><p>영상이 보이지 않으면 <a href="https://www.instagram.com/p/De8mG10Pd_j/" target="_blank" rel="noopener noreferrer">인스타그램에서 열어보세요 ↗</a></p></div>';
+servicePanel.querySelector('#service-film-slot').append(film);
 
 // Speech bubble: fade new text in and ease the bubble to its new height.
 (()=>{

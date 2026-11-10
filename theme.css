@@ -152,3 +152,37 @@ body>.intro-character.is-docked.spotlight-guide{z-index:70!important;opacity:1;f
 details.principle-row[open] summary span,.principle-row summary span{transform:none;font-size:inherit;color:inherit}
 details.principle-row summary .principle-index{font-size:12px;color:#c2461a}
 .principle-row[open] summary{color:#354153}
+
+/* Service story: content follows the reviewed Markdown draft. */
+#panel-overview .service-story-block{padding:56px 0;border-bottom:1px solid var(--line)}
+#panel-overview .service-story-block:last-child{border-bottom:0}
+#panel-overview .service-story-block>h3,#panel-overview .story-together h3{font-size:clamp(26px,3vw,36px);line-height:1.4;margin:16px 0 24px;letter-spacing:-.03em}
+#panel-overview .service-story-block>p:not(.experience-eyebrow),#panel-overview .story-together p:not(.experience-eyebrow){max-width:760px;font-size:16px;line-height:1.9;color:var(--muted);word-break:keep-all;overflow-wrap:anywhere}
+#panel-overview .service-story-block h4{font-size:20px;line-height:1.5;margin:32px 0 12px}
+#panel-overview p.story-emphasis{font-weight:700;color:var(--orange-text);margin-top:28px}
+#panel-overview figure{margin:32px 0 16px}
+#panel-overview .story-homepage img{display:block;width:100%;height:auto;border-radius:16px;border:1px solid #f4d8ca}
+#panel-overview figcaption{font-size:12px;color:var(--muted);line-height:1.7;margin-top:12px}
+#panel-overview .story-link{display:inline-block;font-size:14px;color:var(--orange-text);font-weight:600;margin-top:12px;padding:8px 0}
+#panel-overview .story-people{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:32px}
+#panel-overview .story-person{background:#fff8f3;border:1px solid #f4d8ca;border-radius:18px;padding:24px;min-width:0}
+#panel-overview .story-person-heading{display:flex;align-items:center;gap:16px}
+#panel-overview .story-image-placeholder{width:76px;height:76px;flex:none;border:1px dashed #d9b5a4;background:white;display:grid;place-items:center;border-radius:14px;color:var(--muted);font-size:14px}
+#panel-overview .story-person-heading h4{margin:0 0 4px;font-size:18px}
+#panel-overview .story-person-heading p{margin:0;color:var(--muted);font-size:12px;line-height:1.7}
+#panel-overview .story-speech{position:relative;margin:24px 0 0;background:white;border:1px solid #f0d8cd;border-radius:16px;padding:22px}
+#panel-overview .story-speech:before{content:'';position:absolute;top:-7px;left:28px;width:12px;height:12px;background:white;border-top:1px solid #f0d8cd;border-left:1px solid #f0d8cd;transform:rotate(45deg)}
+#panel-overview .story-speech p{font-size:16px;line-height:1.9;margin:0;word-break:keep-all;overflow-wrap:anywhere}
+#panel-overview .story-speech strong{color:var(--orange-text);font-weight:700}
+#panel-overview .story-speech small{display:block;font-size:11px;color:var(--muted);margin-top:14px;line-height:1.6}
+#panel-overview .app-experience{margin:48px 0 0}
+#panel-overview .service-film{margin:56px 0 0}
+#panel-overview .story-usage-steps{padding-left:22px;font-size:14px;line-height:1.9;color:var(--muted)}
+#panel-overview .story-usage-steps li{padding-left:4px;margin:12px 0;word-break:keep-all}
+#panel-overview .story-together{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:48px}
+#panel-overview .story-together h4{font-size:18px}
+#panel-overview p.story-group-highlight{background:#fff3ec;border:1px solid #f4d8ca;border-radius:16px;padding:24px;margin-top:28px;color:var(--ink)}
+#panel-overview .story-group-highlight strong{color:var(--orange-text);font-size:24px}
+#panel-overview .story-group-screen{text-align:center;border-radius:20px;padding:24px;background:#f5f6f8}
+#panel-overview .story-group-screen img{display:block;width:100%;height:400px;object-fit:contain}
+@media(max-width:760px){#panel-overview .service-story-block{padding:36px 0}#panel-overview .service-story-block>p:not(.experience-eyebrow),#panel-overview .story-together p:not(.experience-eyebrow){font-size:15px}#panel-overview .story-people,#panel-overview .story-together{grid-template-columns:1fr;gap:20px}#panel-overview .story-person{padding:20px}#panel-overview .story-speech{padding:18px}#panel-overview .story-speech p{font-size:15px}#panel-overview .app-experience{margin-top:32px}#panel-overview .service-film{margin-top:36px}#panel-overview .story-group-screen img{height:340px}}
