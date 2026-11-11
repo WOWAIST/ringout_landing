@@ -1,4 +1,3 @@
-// Progressive enhancement: values remain accurate and readable without animation.
 const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
 const researchPanel = document.querySelector('#panel-hypotheses');
 const metrics = [...researchPanel.querySelectorAll('.metrics > div')];
@@ -15,46 +14,18 @@ focusPoints.forEach((element, index) => {
   element.dataset.focusIndex = index;
   element.id ||= `research-focus-${index}`;
 });
-// Animate only once, when the actual panel and metric enter the viewport.
-const metricObserver = new IntersectionObserver(entries => {
-  for (const entry of entries) {
-    if (!entry.isIntersecting || researchPanel.hidden) continue;
-    const strong = entry.target.querySelector('strong');
-    const textNode = [...strong.childNodes].find(node => node.nodeType === Node.TEXT_NODE);
-    const finalText = textNode.textContent.trim();
-    const target = Number(finalText);
-    const decimals = finalText.includes('.') ? 1 : 0;
-    const unit = strong.querySelector('small')?.textContent || '';
-    strong.setAttribute('aria-label', `${finalText}${unit}`);
-    strong.setAttribute('aria-live', 'off');
-    entry.target.classList.add('metric-active');
-    if (!motionPreference.matches) {
-      const start = performance.now();
-      const tick = now => {
-        const p = Math.min(1, (now - start) / 1150);
-        textNode.textContent = (target * (1 - (1-p)**3)).toFixed(decimals);
-        if (p < 1 && !motionPreference.matches && !researchPanel.hidden) requestAnimationFrame(tick);
-        else textNode.textContent = finalText;
-      };
-      requestAnimationFrame(tick);
-    }
-    metricObserver.unobserve(entry.target);
-  }
-}, {threshold:.45});
-metrics.forEach(metric => metricObserver.observe(metric));
 const revealObserver = new IntersectionObserver(entries => {
   for (const entry of entries) if (entry.isIntersecting) {
     entry.target.classList.add('has-entered');
     revealObserver.unobserve(entry.target);
   }
 }, {threshold:.12});
-document.querySelectorAll('.experiments > article,.principles article,.tech-list > article,.statement,.closing').forEach((el,index) => {
+document.querySelectorAll('.principles article,.statement,.closing').forEach((el,index) => {
   el.classList.add('reveal-item');
   el.style.setProperty('--reveal-delay', `${Math.min(index%3,2)*65}ms`);
   revealObserver.observe(el);
 });
 let tourStep = -1;
-let guideFocus = -1;
 const tour = document.createElement('div');
 tour.className = 'research-tour';
 tour.innerHTML = '<div><span class="tour-eyebrow">WITH SEED</span><p>숫자 뒤의 이야기를 함께 볼까요?</p></div><button type="button" class="tour-next">씨앗이와 핵심 보기 <span aria-hidden="true">↗</span></button><button type="button" class="tour-end" hidden>안내 끝내기</button><span class="tour-status" aria-live="polite"></span>';
@@ -77,7 +48,7 @@ next.addEventListener('click', () => {
   tourStep=(tourStep+1)%focusPoints.length;
   focusPoints.forEach((el,index)=>el.classList.toggle('tour-focus',index===tourStep));
   const target=focusPoints[tourStep];
-  target.scrollIntoView({behavior:motionPreference.matches?'instant':'smooth',block:'center'});
+  target.scrollIntoView({ behavior: 'instant', block: 'center' });
   next.textContent=tourStep===focusPoints.length-1?'처음부터 다시 보기':'다음 포인트 →';
   end.hidden=false;guideNext.hidden=false;guideNext.textContent=tourStep===focusPoints.length-1?'처음부터 다시 보기':'다음 포인트 →';
   status.textContent=`${tourStep+1} / ${focusPoints.length}`;
@@ -88,12 +59,12 @@ next.addEventListener('click', () => {
   queueEntrance();
 });
 end.addEventListener('click',clearTour);
-document.querySelector('.tabs').addEventListener('click',clearTour);
-document.querySelector('.tabs').addEventListener('keydown',event=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(event.key))clearTour();});
+storyNav.addEventListener('click', clearTour);
+storyNav.addEventListener('chapterchange', clearTour);
 window.updateResearchGuide = (key,dock) => {
-  if (dock!==1 || key!=='hypotheses' || researchPanel.hidden) {
+  if (dock!==1 || key!=='hypotheses') {
     guide.classList.remove('research-speaking');
-    guideFocus=-1;
+    guideNext.hidden=true;
     return;
   }
   let active=tourStep;
@@ -124,9 +95,54 @@ window.updateResearchGuide = (key,dock) => {
     guide.style.setProperty('--guide-x',`${x}px`);
     guide.style.setProperty('--guide-y',`${y}px`);
   }
-  if(active!==guideFocus){
-    guideFocus=active;
-    if(!motionPreference.matches)seedVideo.animate([{translate:'0 0'},{translate:'0 -9px'},{translate:'0 0'}],{duration:420,easing:'ease-out'});
-  }
 };
 queueEntrance();
+
+
+// Reuse the page's scroll frame so the fixed scene follows scroll in both directions.
+const scrollScenes = [...document.querySelectorAll('[data-scroll-steps]')].map(sequence => ({
+  sequence,
+  stage: sequence.firstElementChild,
+  steps: Number(sequence.dataset.scrollSteps),
+}));
+const sceneMotion = matchMedia('(prefers-reduced-motion: no-preference) and (min-height: 480px)');
+const storyEntries = [...document.querySelectorAll('[data-story-enter]')];
+
+function updateStoryScenes() {
+  const navHeight = storyNav.offsetHeight;
+  for (const { sequence, stage, steps } of scrollScenes) {
+    if (sequence.closest('.story-chapter').hidden) continue;
+    if (!sceneMotion.matches || (sequence.hasAttribute('data-scroll-fit') && stage.firstElementChild.offsetHeight + 24 > innerHeight - navHeight)) {
+      delete sequence.dataset.step;
+      continue;
+    }
+    sequence.dataset.step ??= '0';
+    const bounds = sequence.getBoundingClientRect();
+    const travel = bounds.height - stage.offsetHeight;
+    const progress = (navHeight - bounds.top) / Math.max(1, travel);
+    const step = String(Math.max(0, Math.min(steps - 1, Math.floor(progress * steps))));
+    if (sequence.dataset.step !== step) sequence.dataset.step = step;
+    for (const element of stage.querySelectorAll('[data-story-reveal]')) {
+      element.toggleAttribute('data-story-pending', Number(step) < Number(element.dataset.storyReveal));
+    }
+  }
+  for (const entry of storyEntries) {
+    if (entry.closest('.story-chapter').hidden) continue;
+    const isExperience = entry.classList.contains('story-experience-entry');
+    const ready = isExperience
+      ? entry.previousElementSibling.dataset.step !== undefined
+      : entry.dataset.step !== undefined;
+    if (!ready) {
+      entry.style.removeProperty('--story-entry-opacity');
+      entry.removeAttribute('data-story-entry');
+      continue;
+    }
+    entry.setAttribute('data-story-entry', '');
+    const distance = navHeight - entry.getBoundingClientRect().top;
+    const fadeDistance = 120;
+    const fadeProgress = distance / fadeDistance + (isExperience ? 1 : 0);
+    const opacity = Math.max(0, Math.min(1, fadeProgress));
+    entry.style.setProperty('--story-entry-opacity', opacity);
+  }
+}
+sceneMotion.addEventListener('change', queueEntrance);

@@ -15,4 +15,6 @@ const includes = [...template.matchAll(/<!-- include: (sections\/[a-z-]+\.html) 
 const sections = new Map(await Promise.all(includes.map(async ([, file]) => [file, (await readFile(file, 'utf8')).trimEnd()])));
 let html = template;
 for (const [marker, file] of includes) html = html.replace(marker, () => sections.get(file));
+const alarmFlow = await readFile('assets/ringout-alarm-flow.svg', 'utf8');
+html = html.replace('<!-- include: assets/ringout-alarm-flow.svg -->', () => alarmFlow.trim());
 await writeFile('dist/index.html', html);

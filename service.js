@@ -10,7 +10,7 @@ const serviceSteps=[
 let serviceIndex=0;
 let serviceExplaining=false;
 const section=document.createElement('section');section.className='app-experience';section.setAttribute('aria-label','앱 화면으로 보는 링아웃');
-section.innerHTML=`<div class="experience-copy"><p class="experience-eyebrow">FROM PLAN TO ACTION</p><h3>오늘 밤의 계획이<br>내일 아침의 첫 행동으로.</h3><p class="experience-lead">실제 앱 화면을 따라 링아웃의 하루를 만나보세요.</p><div class="service-steps" role="group" aria-label="서비스 이용 단계"></div></div><div class="app-showcase"><div class="showcase-top"><span class="service-progress">01 / 06</span><span>RINGOUT APP</span></div><div class="phone-view"><img src="" alt="" width="420" height="840"></div><div class="screen-caption" aria-live="polite"><h4></h4><p></p></div><div class="screen-navigation"><button type="button" class="screen-prev" aria-label="이전 앱 화면">←</button><div class="screen-dots" aria-hidden="true"></div><button type="button" class="screen-next" aria-label="다음 앱 화면">→</button></div></div>`;
+section.innerHTML=`<div class="experience-copy"><h3>오늘 밤의 계획이<br>내일 아침의 첫 행동으로.</h3><p class="experience-lead">실제 앱 화면을 따라 링아웃의 하루를 만나보세요.</p><div class="service-steps" role="group" aria-label="서비스 이용 단계"></div></div><div class="app-showcase"><div class="showcase-top"><span class="service-progress">01 / 06</span><span>RINGOUT APP</span></div><div class="phone-view"><img src="" alt="" width="420" height="840"></div><div class="screen-caption" aria-live="polite"><h4></h4><p></p></div><div class="screen-navigation"><button type="button" class="screen-prev" aria-label="이전 앱 화면">←</button><div class="screen-dots" aria-hidden="true"></div><button type="button" class="screen-next" aria-label="다음 앱 화면">→</button></div></div>`;
 servicePanel.querySelector('#service-experience-slot').append(section);
 const buttons=section.querySelector('.service-steps');
 serviceSteps.forEach((step,index)=>{
@@ -29,7 +29,7 @@ document.addEventListener('keydown',event=>{if(event.key==='Escape')stopSpotligh
 let serviceFocusTarget=null;
 function startSeedExplanation(){
  if(!guide.classList.contains('is-docked'))return;
- if(!servicePanel.hidden){
+ if(activeChapter==='overview'){
   if(serviceExplaining){stopSpotlight();return;}
   serviceExplaining=true;
   const phone=section.querySelector('.phone-view');
@@ -43,7 +43,7 @@ function startSeedExplanation(){
   },phone);
   guide.classList.remove('is-collapsed');guideToggle.textContent='설명 접기';guideToggle.setAttribute('aria-expanded','true');
   serviceFocusTarget.scrollIntoView({behavior:motionPreference.matches?'instant':'smooth',block:'center'});queueEntrance();
- }else if(!researchPanel.hidden){
+ }else if(activeChapter==='hypotheses'){
   if(!spotlight.hidden){clearTour();stopSpotlight();return;}
   let index=0,distance=Infinity;
   focusPoints.forEach((node,i)=>{const rect=node.getBoundingClientRect();const d=Math.abs(rect.top+rect.height/2-innerHeight/2);if(d<distance){index=i;distance=d;}});
@@ -70,7 +70,8 @@ function setServiceStep(index){
 }
 section.querySelector('.screen-prev').addEventListener('click',()=>setServiceStep(Math.max(0,serviceIndex-1)));
 section.querySelector('.screen-next').addEventListener('click',()=>setServiceStep(Math.min(serviceSteps.length-1,serviceIndex+1)));
-document.querySelector('.tabs').addEventListener('click',()=>{stopSpotlight();researchLightPaused=false;});
+storyNav.addEventListener('click',stopSpotlight);
+storyNav.addEventListener('chapterchange',stopSpotlight);
 document.querySelector('.tour-next').addEventListener('click',()=>{researchLightPaused=false;});
 function placeSpotlight(target){
  const rect=target.getBoundingClientRect();
@@ -102,7 +103,7 @@ const previousResearchGuide=window.updateResearchGuide;
 window.updateResearchGuide=(key,dock)=>{
  previousResearchGuide?.(key,dock);
  if(dock!==1){spotlight.hidden=true;lightExit.hidden=true;serviceGuideNext.hidden=true;return;}
- if(key==='overview'&&!servicePanel.hidden&&serviceExplaining){
+ if(key==='overview'&&serviceExplaining){
   const step=serviceSteps[serviceIndex];speechLabel.textContent=`앱으로 만나는 링아웃 · ${serviceIndex+1}/6`;speechTitle.textContent=step.title;speechBody.textContent=step.seed;
   guide.classList.add('research-speaking');serviceGuideNext.hidden=false;
   if(serviceFocusTarget?.classList.contains('instagram-frame')){
@@ -113,7 +114,7 @@ window.updateResearchGuide=(key,dock)=>{
  serviceGuideNext.hidden=true;
  if(key==='hypotheses'&&tourStep>=0&&!researchLightPaused){placeSpotlight(focusPoints[tourStep]);return;}
  spotlight.hidden=true;lightExit.hidden=true;guide.classList.remove('spotlight-guide');
- if(key==='overview'&&!servicePanel.hidden){
+ if(key==='overview'){
   guide.classList.add('seed-inviting','research-speaking');
   speechLabel.textContent='씨앗이의 화면 안내';speechTitle.textContent='나를 누르면 설명을 들을 수 있어.';speechBody.textContent='지금 보고 있는 화면을 함께 살펴보자. 드래그하면 나를 옮길 수도 있어.';
  }else{guide.classList.remove('seed-inviting');}
@@ -125,18 +126,18 @@ let spotlightScrollAmount=0;
 let spotlightScrollUntil=0;
 let spotlightLastWheel=0;
 function advanceSpotlight(direction){
- if(serviceExplaining&&!servicePanel.hidden){
+ if(serviceExplaining&&activeChapter==='overview'){
   if(serviceFocusTarget?.classList.contains('instagram-frame')){stopSpotlight();return;}
   const index=serviceIndex+direction;
   if(index<0||index>=serviceSteps.length){stopSpotlight();return;}
   setServiceStep(index);return;
  }
- if(tourStep>=0&&!researchLightPaused&&!researchPanel.hidden){
+ if(tourStep>=0&&!researchLightPaused&&activeChapter==='hypotheses'){
   const index=tourStep+direction;
   if(index<0||index>=focusPoints.length){clearTour();stopSpotlight();return;}
   tourStep=index;
   focusPoints.forEach((el,i)=>el.classList.toggle('tour-focus',i===index));
-  focusPoints[index].scrollIntoView({behavior:motionPreference.matches?'instant':'smooth',block:'center'});
+  focusPoints[index].scrollIntoView({behavior:'instant',block:'center'});
   status.textContent=`${index+1} / ${focusPoints.length}`;
   next.textContent=index===focusPoints.length-1?'처음부터 다시 보기':'다음 포인트 →';
   guideNext.textContent=next.textContent;
@@ -180,7 +181,7 @@ window.updateResearchGuide=(key,dock)=>{currentLightGuide?.(key,dock);lightHint.
 new MutationObserver(()=>{lightHint.hidden=spotlight.hidden;}).observe(spotlight,{attributes:true,attributeFilter:['hidden']});
 
 const film=document.createElement('section');film.className='service-film';film.setAttribute('aria-label','링아웃 소개 영상');
-film.innerHTML='<div class="film-copy"><p class="experience-eyebrow">RINGOUT ON FILM</p><h3>내일 아침 운동을<br>시작하고 싶다면</h3><ol class="story-usage-steps"><li>운동하러 갈 장소를 목적지로 정합니다.</li><li>출발을 준비할 시간과 반복 알람 간격을 설정합니다.</li><li>알람이 울리면 준비를 마치고 목적지로 이동합니다.</li><li>목적지에 도착하면 도착을 확인하고 알람을 종료합니다.</li></ol><p>운동뿐 아니라 도서관에서 공부를 시작하거나 정해진 장소로 이동해야 할 때도 활용할 수 있습니다.</p><a href="https://www.instagram.com/p/De8mG10Pd_j/" target="_blank" rel="noopener noreferrer">인스타그램에서 보기 ↗</a></div><div class="instagram-frame"><iframe src="https://www.instagram.com/p/De8mG10Pd_j/embed/" title="링아웃 인스타그램 소개 영상" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe><p>영상이 보이지 않으면 <a href="https://www.instagram.com/p/De8mG10Pd_j/" target="_blank" rel="noopener noreferrer">인스타그램에서 열어보세요 ↗</a></p></div>';
+film.innerHTML='<div class="film-copy"><h3>내일 아침 운동을<br>시작하고 싶다면</h3><ol class="story-usage-steps" data-story-reveal="1"><li>운동하러 갈 장소를 목적지로 정합니다.</li><li>출발을 준비할 시간과 반복 알람 간격을 설정합니다.</li><li>알람이 울리면 준비를 마치고 목적지로 이동합니다.</li><li>목적지에 도착하면 도착을 확인하고 알람을 종료합니다.</li></ol><p>운동뿐 아니라 도서관에서 공부를 시작하거나 정해진 장소로 이동해야 할 때도 활용할 수 있습니다.</p><a href="https://www.instagram.com/p/De8mG10Pd_j/" target="_blank" rel="noopener noreferrer">인스타그램에서 보기 ↗</a></div><div class="instagram-frame" data-story-reveal="2"><iframe src="https://www.instagram.com/p/De8mG10Pd_j/embed/" title="링아웃 인스타그램 소개 영상" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe><p>영상이 보이지 않으면 <a href="https://www.instagram.com/p/De8mG10Pd_j/" target="_blank" rel="noopener noreferrer">인스타그램에서 열어보세요 ↗</a></p></div>';
 servicePanel.querySelector('#service-film-slot').append(film);
 
 // Speech bubble: fade new text in and ease the bubble to its new height.
