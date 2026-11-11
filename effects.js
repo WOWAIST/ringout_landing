@@ -15,40 +15,13 @@ focusPoints.forEach((element, index) => {
   element.dataset.focusIndex = index;
   element.id ||= `research-focus-${index}`;
 });
-// Animate only once, when the actual panel and metric enter the viewport.
-const metricObserver = new IntersectionObserver(entries => {
-  for (const entry of entries) {
-    if (!entry.isIntersecting || researchPanel.hidden) continue;
-    const strong = entry.target.querySelector('strong');
-    const textNode = [...strong.childNodes].find(node => node.nodeType === Node.TEXT_NODE);
-    const finalText = textNode.textContent.trim();
-    const target = Number(finalText);
-    const decimals = finalText.includes('.') ? 1 : 0;
-    const unit = strong.querySelector('small')?.textContent || '';
-    strong.setAttribute('aria-label', `${finalText}${unit}`);
-    strong.setAttribute('aria-live', 'off');
-    entry.target.classList.add('metric-active');
-    if (!motionPreference.matches) {
-      const start = performance.now();
-      const tick = now => {
-        const p = Math.min(1, (now - start) / 1150);
-        textNode.textContent = (target * (1 - (1-p)**3)).toFixed(decimals);
-        if (p < 1 && !motionPreference.matches && !researchPanel.hidden) requestAnimationFrame(tick);
-        else textNode.textContent = finalText;
-      };
-      requestAnimationFrame(tick);
-    }
-    metricObserver.unobserve(entry.target);
-  }
-}, {threshold:.45});
-metrics.forEach(metric => metricObserver.observe(metric));
 const revealObserver = new IntersectionObserver(entries => {
   for (const entry of entries) if (entry.isIntersecting) {
     entry.target.classList.add('has-entered');
     revealObserver.unobserve(entry.target);
   }
 }, {threshold:.12});
-document.querySelectorAll('.experiments > article,.principles article,.tech-list > article,.statement,.closing').forEach((el,index) => {
+document.querySelectorAll('.principles article,.statement,.closing').forEach((el,index) => {
   el.classList.add('reveal-item');
   el.style.setProperty('--reveal-delay', `${Math.min(index%3,2)*65}ms`);
   revealObserver.observe(el);

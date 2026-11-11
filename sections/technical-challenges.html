@@ -1,5 +1,20 @@
-<div id="panel-tech" role="tabpanel" aria-labelledby="tab-tech" tabindex="0" hidden><div class="panel-intro"><h3>당연한 아침 뒤, 당연하지 않은 기술.</h3><p>정해진 순간에 울리고, 이동을 확인하고, 신뢰할 수 있도록.</p></div><div class="tech-list"><article><div class="tech-number">01</div><div><span class="pill">RELIABILITY · 가상 사례</span><h3>같은 시각에 몰리는 알람 요청</h3><p>오전 7시, 동시에 시작되는 하루. 요청이 몰려도 미션이 안정적으로 시작되도록 처리 경로를 개선했어요.</p><details><summary>문제와 해결 과정 보기 <span>＋</span></summary><div class="tech-detail"><p><b>문제</b> 정각에 집중된 요청으로 응답 지연과 중복 미션이 발생하는 상황을 가정했어요.</p><p><b>접근</b> 중복 요청 처리 기준과 DB 인덱스를 점검하고, 부하 테스트로 병목을 확인했어요.</p><p><b>가상 결과</b> 동일한 테스트 조건에서 p95 응답 시간 820ms → 190ms. 실제 환경에서는 재측정이 필요해요.</p></div></details></div><span class="tech-symbol" aria-hidden="true">↗</span></article><article><div class="tech-number">02</div><div><span class="pill">LOCATION · 가상 사례</span><h3>“도착”을 판단하는 정확한 기준</h3><p>GPS는 언제나 정확하지 않으니까. 위치 오차와 배터리 사용량 사이에서 도착 판정 기준을 고민했어요.</p><details><summary>문제와 해결 과정 보기 <span>＋</span></summary><div class="tech-detail"><p><b>문제</b> 실내와 고층 건물 주변의 위치 오차로 잘못된 도착 판정이 생기는 상황이에요.</p><p><b>접근</b> 위치 정확도와 연속 측정값을 함께 검토하고, 이동 중에만 측정 주기를 조정하는 방식을 실험했어요.</p><p><b>다음 검증</b> 기기·장소별 오탐률과 배터리 소모량을 함께 측정할 계획이에요.</p></div></details></div><span class="tech-symbol" aria-hidden="true">⌖</span></article><article><div class="tech-number">03</div><div><span class="pill">OBSERVABILITY · 가상 사례</span><h3>문제가 생겼을 때, 원인을 찾을 수 있도록</h3><p>미션 시작부터 도착까지의 흐름을 연결해, 사용자 경험 뒤에 숨은 오류를 추적하는 구조를 고민했어요.</p><details><summary>문제와 해결 과정 보기 <span>＋</span></summary><div class="tech-detail"><p><b>문제</b> 여러 처리 단계에 나뉜 로그만으로는 실패한 요청의 흐름을 파악하기 어려웠어요.</p><p><b>접근</b> 요청 식별자로 로그를 연결하고 지연·실패 지표를 대시보드에서 확인하는 예시를 구성했어요.</p><p><b>다음 검증</b> 장애 재현 시나리오로 탐지와 원인 파악에 걸리는 시간을 확인해요.</p></div></details></div><span class="tech-symbol" aria-hidden="true">≋</span></article>
-<article>
+<section class="story-chapter" id="panel-tech" aria-labelledby="chapter-tech" tabindex="-1" hidden>
+<div class="story-reading-block">
+<div class="panel-intro"><h2>당연한 아침 뒤, 당연하지 않은 기술.</h2><p>정해진 순간에 울리고, 이동을 확인하고, 신뢰할 수 있도록.</p></div>
+<div class="tech-list"><article><div class="tech-number">01</div><div><span class="pill">RELIABILITY · 가상 사례</span><h3>같은 시각에 몰리는 알람 요청</h3><p>오전 7시, 동시에 시작되는 하루. 요청이 몰려도 미션이 안정적으로 시작되도록 처리 경로를 개선했어요.</p><details><summary>문제와 해결 과정 보기 <span>＋</span></summary><div class="tech-detail"><p><b>문제</b> 정각에 집중된 요청으로 응답 지연과 중복 미션이 발생하는 상황을 가정했어요.</p><p><b>접근</b> 중복 요청 처리 기준과 DB 인덱스를 점검하고, 부하 테스트로 병목을 확인했어요.</p><p><b>가상 결과</b> 동일한 테스트 조건에서 p95 응답 시간 820ms → 190ms. 실제 환경에서는 재측정이 필요해요.</p></div></details></div><span class="tech-symbol" aria-hidden="true">↗</span></article></div>
+</div>
+
+<div class="story-reading-block">
+<div class="tech-list"><article><div class="tech-number">02</div><div><span class="pill">LOCATION · 가상 사례</span><h3>“도착”을 판단하는 정확한 기준</h3><p>GPS는 언제나 정확하지 않으니까. 위치 오차와 배터리 사용량 사이에서 도착 판정 기준을 고민했어요.</p><details><summary>문제와 해결 과정 보기 <span>＋</span></summary><div class="tech-detail"><p><b>문제</b> 실내와 고층 건물 주변의 위치 오차로 잘못된 도착 판정이 생기는 상황이에요.</p><p><b>접근</b> 위치 정확도와 연속 측정값을 함께 검토하고, 이동 중에만 측정 주기를 조정하는 방식을 실험했어요.</p><p><b>다음 검증</b> 기기·장소별 오탐률과 배터리 소모량을 함께 측정할 계획이에요.</p></div></details></div><span class="tech-symbol" aria-hidden="true">⌖</span></article></div>
+</div>
+
+<div class="story-reading-block">
+<div class="tech-list"><article><div class="tech-number">03</div><div><span class="pill">OBSERVABILITY · 가상 사례</span><h3>문제가 생겼을 때, 원인을 찾을 수 있도록</h3><p>미션 시작부터 도착까지의 흐름을 연결해, 사용자 경험 뒤에 숨은 오류를 추적하는 구조를 고민했어요.</p><details><summary>문제와 해결 과정 보기 <span>＋</span></summary><div class="tech-detail"><p><b>문제</b> 여러 처리 단계에 나뉜 로그만으로는 실패한 요청의 흐름을 파악하기 어려웠어요.</p><p><b>접근</b> 요청 식별자로 로그를 연결하고 지연·실패 지표를 대시보드에서 확인하는 예시를 구성했어요.</p><p><b>다음 검증</b> 장애 재현 시나리오로 탐지와 원인 파악에 걸리는 시간을 확인해요.</p></div></details></div><span class="tech-symbol" aria-hidden="true">≋</span></article></div>
+</div>
+
+
+<div class="story-reading-block">
+<div class="tech-list"><article>
   <div class="tech-number">04</div>
   <div>
     <span class="pill">iOS · 잠금 화면과 미션 복구</span>
@@ -18,5 +33,7 @@
     </details>
   </div>
   <span class="tech-symbol" aria-hidden="true">↻</span>
-</article>
-</div></div>
+</article></div>
+</div>
+
+</section>
