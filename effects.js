@@ -1,4 +1,3 @@
-// Progressive enhancement: values remain accurate and readable without animation.
 const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
 const researchPanel = document.querySelector('#panel-hypotheses');
 const metrics = [...researchPanel.querySelectorAll('.metrics > div')];
@@ -27,7 +26,6 @@ document.querySelectorAll('.principles article,.statement,.closing').forEach((el
   revealObserver.observe(el);
 });
 let tourStep = -1;
-let guideFocus = -1;
 const tour = document.createElement('div');
 tour.className = 'research-tour';
 tour.innerHTML = '<div><span class="tour-eyebrow">WITH SEED</span><p>숫자 뒤의 이야기를 함께 볼까요?</p></div><button type="button" class="tour-next">씨앗이와 핵심 보기 <span aria-hidden="true">↗</span></button><button type="button" class="tour-end" hidden>안내 끝내기</button><span class="tour-status" aria-live="polite"></span>';
@@ -50,7 +48,7 @@ next.addEventListener('click', () => {
   tourStep=(tourStep+1)%focusPoints.length;
   focusPoints.forEach((el,index)=>el.classList.toggle('tour-focus',index===tourStep));
   const target=focusPoints[tourStep];
-  target.scrollIntoView({behavior:motionPreference.matches?'instant':'smooth',block:'center'});
+  target.scrollIntoView({ behavior: 'instant', block: 'center' });
   next.textContent=tourStep===focusPoints.length-1?'처음부터 다시 보기':'다음 포인트 →';
   end.hidden=false;guideNext.hidden=false;guideNext.textContent=tourStep===focusPoints.length-1?'처음부터 다시 보기':'다음 포인트 →';
   status.textContent=`${tourStep+1} / ${focusPoints.length}`;
@@ -61,12 +59,12 @@ next.addEventListener('click', () => {
   queueEntrance();
 });
 end.addEventListener('click',clearTour);
-document.querySelector('.tabs').addEventListener('click',clearTour);
-document.querySelector('.tabs').addEventListener('keydown',event=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(event.key))clearTour();});
+storyNav.addEventListener('click', clearTour);
+storyNav.addEventListener('chapterchange', clearTour);
 window.updateResearchGuide = (key,dock) => {
-  if (dock!==1 || key!=='hypotheses' || researchPanel.hidden) {
+  if (dock!==1 || key!=='hypotheses') {
     guide.classList.remove('research-speaking');
-    guideFocus=-1;
+    guideNext.hidden=true;
     return;
   }
   let active=tourStep;
@@ -97,9 +95,54 @@ window.updateResearchGuide = (key,dock) => {
     guide.style.setProperty('--guide-x',`${x}px`);
     guide.style.setProperty('--guide-y',`${y}px`);
   }
-  if(active!==guideFocus){
-    guideFocus=active;
-    if(!motionPreference.matches)seedVideo.animate([{translate:'0 0'},{translate:'0 -9px'},{translate:'0 0'}],{duration:420,easing:'ease-out'});
-  }
 };
 queueEntrance();
+
+
+// Reuse the page's scroll frame so the fixed scene follows scroll in both directions.
+const scrollScenes = [...document.querySelectorAll('[data-scroll-steps]')].map(sequence => ({
+  sequence,
+  stage: sequence.firstElementChild,
+  steps: Number(sequence.dataset.scrollSteps),
+}));
+const sceneMotion = matchMedia('(prefers-reduced-motion: no-preference) and (min-height: 480px)');
+const storyEntries = [...document.querySelectorAll('[data-story-enter]')];
+
+function updateStoryScenes() {
+  const navHeight = storyNav.offsetHeight;
+  for (const { sequence, stage, steps } of scrollScenes) {
+    if (sequence.closest('.story-chapter').hidden) continue;
+    if (!sceneMotion.matches || (sequence.hasAttribute('data-scroll-fit') && stage.firstElementChild.offsetHeight + 24 > innerHeight - navHeight)) {
+      delete sequence.dataset.step;
+      continue;
+    }
+    sequence.dataset.step ??= '0';
+    const bounds = sequence.getBoundingClientRect();
+    const travel = bounds.height - stage.offsetHeight;
+    const progress = (navHeight - bounds.top) / Math.max(1, travel);
+    const step = String(Math.max(0, Math.min(steps - 1, Math.floor(progress * steps))));
+    if (sequence.dataset.step !== step) sequence.dataset.step = step;
+    for (const element of stage.querySelectorAll('[data-story-reveal]')) {
+      element.toggleAttribute('data-story-pending', Number(step) < Number(element.dataset.storyReveal));
+    }
+  }
+  for (const entry of storyEntries) {
+    if (entry.closest('.story-chapter').hidden) continue;
+    const isExperience = entry.classList.contains('story-experience-entry');
+    const ready = isExperience
+      ? entry.previousElementSibling.dataset.step !== undefined
+      : entry.dataset.step !== undefined;
+    if (!ready) {
+      entry.style.removeProperty('--story-entry-opacity');
+      entry.removeAttribute('data-story-entry');
+      continue;
+    }
+    entry.setAttribute('data-story-entry', '');
+    const distance = navHeight - entry.getBoundingClientRect().top;
+    const fadeDistance = 120;
+    const fadeProgress = distance / fadeDistance + (isExperience ? 1 : 0);
+    const opacity = Math.max(0, Math.min(1, fadeProgress));
+    entry.style.setProperty('--story-entry-opacity', opacity);
+  }
+}
+sceneMotion.addEventListener('change', queueEntrance);

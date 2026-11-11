@@ -2,7 +2,7 @@
 <html lang="ko">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#f87945"><meta name="description" content="계획을 첫 행동으로. RingOut 데모데이 — 가설 검증과 기술적 도전의 기록"><title>RingOut — 계획을 첫 행동으로</title><link rel="icon" href="./favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="./styles.css"><link rel="stylesheet" href="./theme.css"><script src="./app.js" defer></script><script src="./effects.js" defer></script><script src="./service.js" defer></script><script src="./intro.js" defer></script><script type="module" src="./forest3d.js"></script></head>
 <body>
-<a class="skip" href="#main">본문으로 건너뛰기</a>
+<a class="skip" href="#panel-overview">본문으로 건너뛰기</a>
 <main id="main">
 <section class="entrance" aria-label="링아웃 소개"><div class="entrance-stage">
 <div class="page-reveal">
@@ -13,12 +13,15 @@
 <div class="intro-character"><p class="intro-kicker"></p><div class="speech"><span class="speech-label">안녕, 난 링아웃의 작은 씨앗!</span><h2>눈만 뜨지 말고,<br>우리 같이 움직여볼까?</h2><p>계획이 첫 행동이 되는 아침으로 초대할게.</p></div><video class="seed-video" autoplay muted loop playsinline preload="auto" aria-label="웃고 있는 링아웃 씨앗 캐릭터"><source src="./assets/smiling-seed-transparent.webm" type="video/webm"></video><div class="scroll-invitation"><span>스크롤해서 내일의 문을 열어봐</span><span class="scroll-arrow" aria-hidden="true">↓</span></div></div>
 <button class="intro-skip" type="button">바로 만나보기 ↗</button><span class="entrance-brand" aria-hidden="true">ringout.</span>
 </div></section>
-<section class="journey" aria-label="서비스 이용 과정"><span class="journey-label">HOW RINGOUT WORKS</span><p><b>01</b> 내일의 목표 정하기</p><span class="arrow">→</span><p><b>02</b> 알람과 함께 출발</p><span class="arrow">→</span><p><b>03</b> 도착으로 완성하기</p></section>
-<section class="story" id="story"><div class="section-heading"><div><p class="eyebrow">BEHIND THE MORNING</p><h2>더 나은 아침을 만든<br>우리의 질문과 도전.</h2></div><p>아이디어에서 실제 행동까지.<br>우리가 확인하고, 바꾸고, 만들어온 이야기예요.</p></div>
-<div class="tabs" role="tablist" aria-label="프로젝트 이야기"><button id="tab-overview" role="tab" aria-selected="true" aria-controls="panel-overview" tabindex="0">서비스 이야기 <span>01</span></button><button id="tab-hypotheses" role="tab" aria-selected="false" aria-controls="panel-hypotheses" tabindex="-1">가설 검증 <span>02</span></button><button id="tab-tech" role="tab" aria-selected="false" aria-controls="panel-tech" tabindex="-1">기술적 도전 <span>03</span></button></div>
+<nav class="story-nav" aria-label="프로젝트 이야기">
+<a id="chapter-overview" href="#panel-overview" aria-current="location">서비스 이야기</a>
+<a id="chapter-hypotheses" href="#panel-hypotheses">가설 검증</a>
+<a id="chapter-tech" href="#panel-tech">기술적 도전</a>
+</nav>
+<div class="story" id="story">
 <!-- include: sections/service-story.html -->
 <!-- include: sections/hypothesis-validation.html -->
 <!-- include: sections/technical-challenges.html -->
-</section>
+</div>
 <section class="closing"><div><p class="eyebrow">YOUR NEXT MORNING</p><h2>내일의 나를 움직이는<br>작은 시작, 링아웃.</h2></div><a class="primary dark" href="https://www.ringout.my/" target="_blank" rel="noopener noreferrer">링아웃 만나보기 <span>↗</span></a></section>
 </main><footer><a class="brand" href="#">ringout.</a><p>계획을 첫 행동으로.</p><span>© 2026 RingOut · Demo Day</span></footer></body></html>

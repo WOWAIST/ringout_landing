@@ -1,55 +1,92 @@
-const tabs = [...document.querySelectorAll('[role="tab"]')];
-const validTabs = new Set(tabs.map(tab => tab.id.slice(4)));
-function activateTab(name, updateUrl = true) {
-  if (!validTabs.has(name)) name = 'overview';
-  tabs.forEach(tab => {
-    const selected = tab.id === `tab-${name}`;
-    tab.setAttribute('aria-selected', String(selected));
-    tab.tabIndex = selected ? 0 : -1;
-    document.getElementById(tab.getAttribute('aria-controls')).hidden = !selected;
-  });
-  if (updateUrl) {
+const storyNav = document.querySelector('.story-nav');
+const chapterLinks = [...storyNav.querySelectorAll('a')];
+const chapters = chapterLinks.map(link => document.getElementById(link.hash.slice(1)));
+let selectedChapter = chapters[0];
+let activeChapter = 'overview';
+const chapterOffsets = new Map();
+
+function showChapter(chapter) {
+  if (chapter !== selectedChapter) {
+    chapterOffsets.set(selectedChapter, Math.max(0, window.scrollY - entrance.offsetHeight));
+    selectedChapter = chapter;
+    activeChapter = chapter.id.slice('panel-'.length);
+    entrance.hidden = chapter !== chapters[0];
+    chapters.forEach((panel, index) => {
+      const selected = panel === chapter;
+      panel.hidden = !selected;
+      if (selected) chapterLinks[index].setAttribute('aria-current', 'location');
+      else chapterLinks[index].removeAttribute('aria-current');
+    });
+    storyNav.dispatchEvent(new Event('chapterchange'));
+  }
+  const top = entrance.offsetHeight + (chapterOffsets.get(chapter) ?? 0);
+  window.scrollTo({ top, behavior: 'instant' });
+  queueEntrance();
+}
+
+function chapterFromUrl() {
+  const url = new URL(location.href);
+  const id = url.hash && url.hash !== '#story'
+    ? url.hash.slice(1)
+    : `panel-${url.searchParams.get('tab') ?? 'overview'}`;
+  return chapters.find(chapter => chapter.id === id);
+}
+
+function openChapterLink(event, chapter) {
+  if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  event.preventDefault();
+  if (location.hash !== `#${chapter.id}`) {
     const url = new URL(location.href);
-    url.searchParams.set('tab', name);
-    history.replaceState(null, '', url);
+    url.searchParams.delete('tab');
+    url.hash = chapter.id;
+    history.pushState(null, '', url);
+  }
+  if (chapter !== selectedChapter || entrance.getBoundingClientRect().bottom > 0) {
+    showChapter(chapter);
   }
 }
-tabs.forEach((tab, index) => {
-  tab.addEventListener('click', () => activateTab(tab.id.slice(4)));
-  tab.addEventListener('keydown', event => {
-    let next;
-    if (event.key === 'ArrowRight') next = (index + 1) % tabs.length;
-    if (event.key === 'ArrowLeft') next = (index + tabs.length - 1) % tabs.length;
-    if (event.key === 'Home') next = 0;
-    if (event.key === 'End') next = tabs.length - 1;
-    if (next === undefined) return;
-    event.preventDefault();
-    activateTab(tabs[next].id.slice(4));
-    tabs[next].focus();
-  });
+
+chapterLinks.forEach((link, index) => {
+  link.addEventListener('click', event => openChapterLink(event, chapters[index]));
 });
-activateTab(new URL(location.href).searchParams.get('tab'), false);
-window.addEventListener('popstate', () => activateTab(new URL(location.href).searchParams.get('tab'), false));
+document.querySelector('.skip').addEventListener('click', event => {
+  openChapterLink(event, chapters[0]);
+  if (event.defaultPrevented) chapters[0].focus({ preventScroll: true });
+});
+window.addEventListener('popstate', () => {
+  const chapter = chapterFromUrl();
+  if (chapter && chapter !== selectedChapter) showChapter(chapter);
+});
 
 // The door position follows native scrolling in both directions.
 const entrance = document.querySelector('.entrance');
+const entranceStage = entrance.querySelector('.entrance-stage');
 const reveal = entrance.querySelector('.page-reveal');
 const skipIntro = entrance.querySelector('.intro-skip');
 const seedVideo = entrance.querySelector('video');
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+const takeoffProgress = .91;
+const arrivalRunway = Number(getComputedStyle(entrance).getPropertyValue('--arrival-runway'));
 let entranceFrame = 0;
+
 function renderEntrance() {
   entranceFrame = 0;
-  const range = entrance.offsetHeight - window.innerHeight;
-  const progress = reducedMotion.matches ? 1 : Math.max(0, Math.min(1, -entrance.getBoundingClientRect().top / Math.max(1, range)));
+  const entranceBounds = entrance.getBoundingClientRect();
+  const skipAnimation = entrance.hidden || reducedMotion.matches;
+  // Reserve the extra scroll distance for the destination before takeoff.
+  const range = entranceBounds.height - window.innerHeight - entranceStage.getBoundingClientRect().height * arrivalRunway;
+  const progress = skipAnimation ? 1 : Math.max(0, Math.min(1, -entranceBounds.top / Math.max(1, range)));
+  const takeoff = window.innerHeight + Math.max(0, range) * (1 - takeoffProgress);
+  const flight = skipAnimation ? 0 : Math.max(0, Math.min(1, 1 - entranceBounds.bottom / takeoff));
   const door = Math.max(0, Math.min(1, (progress - .025) / .20));
   const travel = reducedMotion.matches ? 1 : Math.max(0, Math.min(1, (progress - .25) / .60));
   const arrival = Math.max(0, Math.min(1, (travel - .65) / .35));
   entrance.style.setProperty('--travel', travel);
+  entrance.style.setProperty('--seed-flight', flight);
   // Spring turns to autumn while the seed walks to the destination.
   const seasonLinear = Math.max(0, Math.min(1, (travel - .08) / .8));
   entrance.style.setProperty('--season', seasonLinear * seasonLinear * (3 - 2 * seasonLinear));
-  document.body.classList.toggle('seed-on-path', travel > .02 && entrance.getBoundingClientRect().bottom >= window.innerHeight - 2);
+  document.body.classList.toggle('seed-on-path', travel > .02 && entranceBounds.bottom >= window.innerHeight - 2);
   document.body.classList.toggle('seed-arrived', travel >= .94);
   entrance.style.setProperty('--arrival', arrival);
   entrance.style.setProperty('--arrival-y', `${(1-arrival)*65}px`);
@@ -68,7 +105,9 @@ function renderEntrance() {
   entrance.classList.toggle('is-open', open);
   reveal.inert = !open;
   skipIntro.disabled = open;
-  updateGuide(progress);
+  updateGuide(progress, flight, entranceBounds.bottom <= 0);
+  updateSeedFlight(flight);
+  if (typeof updateStoryScenes === 'function') updateStoryScenes();
   if (reducedMotion.matches || document.hidden) seedVideo.pause();
   else if (seedVideo.paused) seedVideo.play().catch(() => {});
 }
@@ -79,10 +118,8 @@ window.addEventListener('scroll', queueEntrance, { passive: true });
 window.addEventListener('resize', queueEntrance);
 reducedMotion.addEventListener('change', queueEntrance);
 skipIntro.addEventListener('click', () => {
-  window.scrollTo({ top: entrance.offsetTop + entrance.offsetHeight - window.innerHeight, behavior: 'instant' });
-  renderEntrance();
-  const link = reveal.querySelector('a');
-  if (link) link.focus({ preventScroll: true });
+  showChapter(chapters[0]);
+  chapters[0].focus({ preventScroll: true });
 });
 seedVideo.addEventListener('error', () => { seedVideo.hidden = true; });
 // Keep the same character above the doors and outside the sticky clipping area.
@@ -108,7 +145,7 @@ const guideMessages = {
   journey: ['이렇게 시작하면 돼', '목표를 정하고, 출발하고, 도착!', '오늘 밤의 계획을 내일의 첫 행동으로 이어봐.'],
   overview: ['우리가 시작한 질문', '눈을 떴는데, 왜 아직 침대일까?', '링아웃이 기상 이후의 행동에 집중한 이유야.'],
   hypotheses: ['데이터로 확인한 이야기', '최초 알람 울림의 70%가 오전이었어.', '모임 결과는 아직 초기 관측이야. 한계도 같이 살펴봐!'],
-  tech: ['기술 이야기 · 현재 가상 사례', '안정적인 아침 뒤에는 어떤 고민이 있을까?', '이 탭은 아직 예시야. 실제 기술 성과로 검증된 내용은 아니야.'],
+  tech: ['기술적 도전', '안정적인 아침 뒤에는 어떤 고민이 있을까?', '가상 사례와 실제 iOS 알람 복구 사례를 함께 살펴봐.'],
   closing: ['이제 너의 아침으로', '내일의 첫 행동, 같이 시작해볼까?', '링아웃 만나보기에서 실제 서비스를 확인할 수 있어.']
 };
 let guideMessageKey = '';
@@ -117,47 +154,43 @@ let idleReturnTimer;
 let portalTimer;
 let dragState = null;
 let entrancePhase = 'center';
-let entrancePortalTimer;
-function updateGuide(progress) {
-  const pageHasMoved = progress > .26;
-  if (!pageHasMoved && !reducedMotion.matches) {
-    clearTimeout(entrancePortalTimer);
-    if (entrancePhase !== 'center') {
-      clearTimeout(idleReturnTimer);
-      clearTimeout(portalTimer);
-      portal.classList.remove('is-visible');
-      guide.classList.remove('entrance-sink', 'entrance-emerge', 'portal-out', 'portal-in');
-    }
-    entrancePhase = 'center';
+function updateGuide(progress, flight, landed) {
+  if (!landed && entrancePhase === 'docked') {
+    clearTimeout(idleReturnTimer);
+    clearTimeout(portalTimer);
+    portal.classList.remove('is-visible');
+    guide.classList.remove('portal-out', 'portal-in');
     manualPosition = null;
     dragState = null;
+    dragHandle.classList.remove('is-dragging');
     guide.style.setProperty('--drag-x', '0px');
     guide.style.setProperty('--drag-y', '0px');
-  } else if (entrancePhase === 'center') {
-    if (reducedMotion.matches) entrancePhase = 'docked';
-    else beginEntrancePortal();
   }
-  const dock = entrancePhase === 'docked' ? 1 : 0;
+  entrancePhase = landed ? 'docked' : flight > 0 ? 'flying' : 'center';
+  const dock = landed ? 1 : 0;
+  const dockLayout = landed || flight > 0 ? 1 : 0;
+  const awaitingLanding = !landed && (progress > .26 || reducedMotion.matches);
+  guide.classList.toggle('is-awaiting-landing', awaitingLanding);
+  guide.inert = awaitingLanding;
   const mobile = window.innerWidth <= 760;
   const initialWidth = Math.min(360, window.innerWidth - 32);
   const dockWidth = mobile ? 150 : 216;
-  const width = initialWidth + (dockWidth - initialWidth) * dock;
+  const width = initialWidth + (dockWidth - initialWidth) * dockLayout;
   const targetY = window.innerHeight - (mobile ? 132 : 176);
-  guide.style.setProperty('--guide-x', `${window.innerWidth / 2 + (window.innerWidth - dockWidth / 2 - (mobile ? 12 : 24) - window.innerWidth / 2) * dock}px`);
-  guide.style.setProperty('--guide-y', `${window.innerHeight / 2 + (targetY - window.innerHeight / 2) * dock}px`);
+  guide.style.setProperty('--guide-x', `${window.innerWidth / 2 + (window.innerWidth - dockWidth / 2 - (mobile ? 12 : 24) - window.innerWidth / 2) * dockLayout}px`);
+  guide.style.setProperty('--guide-y', `${window.innerHeight / 2 + (targetY - window.innerHeight / 2) * dockLayout}px`);
   guide.style.setProperty('--guide-width', `${width}px`);
-  guide.style.setProperty('--seed-size', `${(mobile ? 210 : 245) + ((mobile ? 88 : 126) - (mobile ? 210 : 245)) * dock}px`);
-  guide.style.setProperty('--speech-size', `${(mobile ? 26 : 29) + ((mobile ? 14 : 15) - (mobile ? 26 : 29)) * dock}px`);
-  guide.classList.toggle('is-docked', dock === 1);
+  guide.style.setProperty('--seed-size', `${(mobile ? 210 : 245) + ((mobile ? 88 : 126) - (mobile ? 210 : 245)) * dockLayout}px`);
+  guide.style.setProperty('--speech-size', `${(mobile ? 26 : 29) + ((mobile ? 14 : 15) - (mobile ? 26 : 29)) * dockLayout}px`);
+  guide.classList.toggle('is-docked', dockLayout === 1);
   dragHandle.disabled = dock !== 1;
   document.body.classList.toggle('guide-active', dock >= .8);
-  let key = dock === 0 && !reducedMotion.matches ? 'intro' : 'hero';
+  let key = dockLayout === 0 ? 'intro' : 'hero';
   if (key !== 'intro') {
     const anchor = window.innerHeight * .6;
-    for (const [selector, name] of [['.journey','journey'], ['.story', 'story'], ['.closing','closing']]) {
+    for (const [selector, name] of [['.story', activeChapter], ['.closing','closing']]) {
       if (document.querySelector(selector).getBoundingClientRect().top <= anchor) key = name;
     }
-    if (key === 'story') key = document.querySelector('[role="tab"][aria-selected="true"]').id.slice(4);
   }
   if (key !== guideMessageKey) {
     guideMessageKey = key;
@@ -170,8 +203,28 @@ function updateGuide(progress) {
   }
   window.updateResearchGuide?.(key, dock);
 }
-document.querySelector('.tabs').addEventListener('click', queueEntrance);
-document.querySelector('.tabs').addEventListener('keydown', queueEntrance);
+function updateSeedFlight(progress) {
+  flyingSeed.hidden = progress <= 0 || progress >= 1;
+  if (flyingSeed.hidden) return;
+
+  const launch = window.getSeedLaunchBox?.() ?? {
+    x: innerWidth * .4,
+    y: innerHeight * .68,
+    size: innerHeight * .27,
+  };
+  const landing = seedVideo.getBoundingClientRect();
+  const endX = landing.left + landing.width / 2;
+  const endY = landing.top + landing.height / 2;
+  const arc = Math.sin(Math.PI * progress);
+  const x = launch.x + (endX - launch.x) * progress;
+  const y = launch.y + (endY - launch.y) * progress - Math.min(220, innerHeight * .28) * arc;
+  const size = launch.size + (landing.width - launch.size) * progress + launch.size * .6 * arc;
+
+  flyingSeed.style.left = `${x}px`;
+  flyingSeed.style.top = `${y}px`;
+  flyingSeed.style.width = `${size}px`;
+  flyingSeed.style.rotate = `${(launch.rotation ?? 0) * (1 - progress) + 12 * arc}deg`;
+}
 window.addEventListener('popstate', queueEntrance);
 document.addEventListener('visibilitychange', queueEntrance);
 // Drag the guide as one group: character, bubble, and controls.
@@ -189,10 +242,15 @@ const portal = document.createElement('div');
 portal.className = 'seed-portal';
 portal.setAttribute('aria-hidden', 'true');
 document.body.append(portal);
-for (const selector of ['.hero-copy','.journey','.story','.closing']) {
+const flyingSeed = new Image();
+flyingSeed.src = './assets/seed-front-original.png';
+flyingSeed.alt = '';
+flyingSeed.className = 'seed-flight';
+flyingSeed.hidden = true;
+document.body.append(flyingSeed);
+for (const [selector, key] of [['.hero-copy', 'hero'], ['.story', 'overview'], ['.closing', 'closing']]) {
   const note = document.createElement('p');
   note.className = 'inline-guide-copy';
-  const key = {'.hero-copy':'hero','.journey':'journey','.story':'overview','.closing':'closing'}[selector];
   note.textContent = `${guideMessages[key][1]} ${guideMessages[key][2]}`;
   document.querySelector(selector).append(note);
 }
@@ -276,21 +334,10 @@ function positionEntrancePortal() {
   guide.style.setProperty('--portal-cut', `${Math.max(0, group.bottom - mouthY)}px`);
   guide.style.setProperty('--sink-distance', `${rect.height + 24}px`);
 }
-function beginEntrancePortal() {
-  entrancePhase = 'departing';
-  positionEntrancePortal();
-  portal.classList.add('is-visible');
-  guide.classList.add('entrance-sink');
-  entrancePortalTimer = setTimeout(() => {
-    entrancePhase = 'docked';
-    guide.classList.remove('entrance-sink');
-    renderEntrance();
-    positionEntrancePortal();
-    guide.classList.add('entrance-emerge');
-    entrancePortalTimer = setTimeout(() => {
-      guide.classList.remove('entrance-emerge');
-      portal.classList.remove('is-visible');
-    }, 850);
-  }, 760);
-}
+
 renderEntrance();
+
+if (location.hash || new URL(location.href).searchParams.has('tab')) {
+  const chapter = chapterFromUrl();
+  if (chapter) showChapter(chapter);
+}

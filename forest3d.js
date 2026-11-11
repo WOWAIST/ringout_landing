@@ -67,6 +67,8 @@ try {
   backTexture.colorSpace=frontTexture.colorSpace=THREE.SRGBColorSpace;
   const seedMaterial=new THREE.SpriteMaterial({map:backTexture,transparent:true,depthTest:false});
   const seed=new THREE.Sprite(seedMaterial);seed.scale.set(1.5,1.5,1);seed.renderOrder=20;scene.add(seed);
+  let launchY = .6;
+  let launchRotation = 0;
   // "도착!" bubble that rides above the seed while it hops at the destination.
   const arrivalBubble=document.createElement('div');
   arrivalBubble.className='seed-arrival-bubble';arrivalBubble.textContent='도착!';arrivalBubble.setAttribute('aria-hidden','true');
@@ -74,6 +76,7 @@ try {
   const bubbleAnchor=new THREE.Vector3();
   let visible=false,frame;
   function resize(){
+    if (!host.clientHeight) return;
     renderer.setSize(host.clientWidth,host.clientHeight);camera.aspect=host.clientWidth/host.clientHeight;camera.updateProjectionMatrix();
     const halfWidthPerDepth=Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*camera.aspect;
     // Narrow screens get a smaller grove so it never covers the headline.
@@ -104,16 +107,21 @@ try {
     }
     const traveling=p>.02&&p<.94;
     const arrived=p>=.94;
-    seed.visible=traveling||arrived;
+    const inFlight = Number(entranceStyle.getPropertyValue('--seed-flight')) > 0;
+    seed.visible = (traveling || arrived) && !inFlight;
     const walk=motion.matches?0:Math.sin(t*8)*.035;
     const hop=motion.matches?0:Math.abs(Math.sin(t*5.5))*.35;
     seed.position.set(arrived?-1.05:Math.sin(p*7)*.2,arrived?.6+hop:.5+Math.abs(walk),camera.position.z-5.5);
     seedMaterial.map=arrived?frontTexture:backTexture;
     seedMaterial.rotation=arrived?Math.sin(t*5.5)*.06:walk;
+    if (arrived && !inFlight) {
+      launchY = seed.position.y;
+      launchRotation = seedMaterial.rotation;
+    }
     // Both source assets are square. Preserve their aspect ratio across the turn.
     seed.scale.set(1.45,1.45,1);
 
-    arrivalBubble.classList.toggle('is-visible',arrived);
+    arrivalBubble.classList.toggle('is-visible', arrived && !inFlight);
     if(arrived){
       bubbleAnchor.set(seed.position.x,seed.position.y+seed.scale.y*.5,seed.position.z).project(camera);
       arrivalBubble.style.left=`${(bubbleAnchor.x+1)/2*host.clientWidth}px`;
@@ -124,8 +132,23 @@ try {
   }
   function sync(){cancelAnimationFrame(frame);if(visible&&!document.hidden){if(motion.matches)draw(0,false);else frame=requestAnimationFrame(draw);}}
   new IntersectionObserver(([e])=>{visible=e.isIntersecting;sync();}).observe(host);
-  addEventListener('resize',resize);addEventListener('scroll',()=>{if(motion.matches&&visible)draw(0,false);},{passive:true});
+  new ResizeObserver(resize).observe(host);
+  addEventListener('scroll',()=>{if(motion.matches&&visible)draw(0,false);},{passive:true});
   document.addEventListener('visibilitychange',sync);motion.addEventListener('change',sync);
   renderer.domElement.addEventListener('webglcontextlost',()=>host.classList.remove('has-webgl'));
+  // Project the last visible hop pose into viewport pixels for the handoff.
+  const launchCenter = new THREE.Vector3();
+  const launchTop = new THREE.Vector3();
+  window.getSeedLaunchBox = () => {
+    if (!host.classList.contains('has-webgl')) return;
+    launchCenter.set(-1.05, launchY, camera.position.z - 5.5).project(camera);
+    launchTop.set(-1.05, launchY + .725, camera.position.z - 5.5).project(camera);
+    return {
+      x: host.getBoundingClientRect().left + (launchCenter.x + 1) * host.clientWidth / 2,
+      y: (1 - launchCenter.y) * host.clientHeight / 2,
+      size: (launchTop.y - launchCenter.y) * host.clientHeight,
+      rotation: -THREE.MathUtils.radToDeg(launchRotation),
+    };
+  };
   resize();host.classList.add('has-webgl');
 }catch(error){console.warn('3D forest unavailable; using tree image fallback.',error);}
