@@ -3,6 +3,7 @@ const chapterLinks = [...storyNav.querySelectorAll('a')];
 const chapters = chapterLinks.map(link => document.getElementById(link.hash.slice(1)));
 let selectedChapter = chapters[0];
 let activeChapter = 'overview';
+document.body.dataset.chapter = activeChapter;
 const chapterOffsets = new Map();
 
 function showChapter(chapter) {
@@ -10,6 +11,7 @@ function showChapter(chapter) {
     chapterOffsets.set(selectedChapter, Math.max(0, window.scrollY - entrance.offsetHeight));
     selectedChapter = chapter;
     activeChapter = chapter.id.slice('panel-'.length);
+    document.body.dataset.chapter = activeChapter;
     entrance.hidden = chapter !== chapters[0];
     chapters.forEach((panel, index) => {
       const selected = panel === chapter;
@@ -36,23 +38,45 @@ function openChapterLink(event, chapter) {
   if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
   event.preventDefault();
   if (location.hash !== `#${chapter.id}`) {
-    const url = new URL(location.href);
-    url.searchParams.delete('tab');
-    url.hash = chapter.id;
-    history.pushState(null, '', url);
+    // 구글 사이트처럼 iframe(srcdoc)에 삽입되면 주소 변경이 막힐 수 있다. 실패해도 탭 전환은 계속한다.
+    try {
+      const url = new URL(location.href);
+      url.searchParams.delete('tab');
+      url.hash = chapter.id;
+      history.pushState(null, '', url);
+    } catch {}
   }
   if (chapter !== selectedChapter || entrance.getBoundingClientRect().bottom > 0) {
     showChapter(chapter);
   }
 }
 
-chapterLinks.forEach((link, index) => {
-  link.addEventListener('click', event => openChapterLink(event, chapters[index]));
-});
-document.querySelector('.skip').addEventListener('click', event => {
-  openChapterLink(event, chapters[0]);
-  if (event.defaultPrevented) chapters[0].focus({ preventScroll: true });
-});
+// 같은 페이지 안의 #링크(탭, ‘메타버스로 이동’, 본문 건너뛰기 등)는 한곳에서 처리한다.
+// 구글 사이트 삽입 코드에는 document 캡처 단계에서 모든 #링크의 클릭을 가로채
+// stopPropagation하는 스크립트가 들어간다. window 캡처 단계가 그보다 먼저 실행되므로
+// 여기서 처리하고 전파를 멈춘다. 일반 사이트에서도 같은 방식으로 동작한다.
+window.addEventListener('click', event => {
+  if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  const link = event.target instanceof Element ? event.target.closest('a[href^="#"]') : null;
+  if (!link) return;
+  let id = link.getAttribute('href').slice(1);
+  try { id = decodeURIComponent(id); } catch {}
+  const chapter = chapters.find(panel => panel.id === id);
+  const isChapterLink = chapter && (chapterLinks.includes(link) || link.hasAttribute('data-open-chapter') || link.classList.contains('skip'));
+  if (isChapterLink) {
+    event.stopImmediatePropagation();
+    openChapterLink(event, chapter);
+    if (link.classList.contains('skip')) chapters[0].focus({ preventScroll: true });
+    // 탭 버튼 클릭을 기다리는 다른 안내(설명·투어 종료)도 그대로 받도록 알린다.
+    if (chapterLinks.includes(link)) storyNav.dispatchEvent(new Event('click'));
+    return;
+  }
+  const target = id ? document.getElementById(id) : document.documentElement;
+  if (!target || target.closest('[hidden]')) return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  target.scrollIntoView({ behavior: reducedMotion.matches ? 'auto' : 'smooth', block: 'start' });
+}, true);
 window.addEventListener('popstate', () => {
   const chapter = chapterFromUrl();
   if (chapter && chapter !== selectedChapter) showChapter(chapter);
@@ -145,6 +169,7 @@ const guideMessages = {
   journey: ['이렇게 시작하면 돼', '목표를 정하고, 출발하고, 도착!', '오늘 밤의 계획을 내일의 첫 행동으로 이어봐.'],
   overview: ['우리가 시작한 질문', '눈을 떴는데, 왜 아직 침대일까?', '링아웃이 기상 이후의 행동에 집중한 이유야.'],
   hypotheses: ['데이터로 확인한 이야기', '최초 알람 울림의 70%가 오전이었어.', '모임 결과는 아직 초기 관측이야. 한계도 같이 살펴봐!'],
+  metaverse: ['링아웃 월드', '나를 누르면 링아웃 월드로 데려다줄게!', '새 창에서 광장이 열려. 드래그하면 나를 옮길 수도 있어.'],
   tech: ['기술적 도전', '안정적인 아침 뒤에는 어떤 고민이 있을까?', '가상 사례와 실제 iOS 알람 복구 사례를 함께 살펴봐.'],
   closing: ['이제 너의 아침으로', '내일의 첫 행동, 같이 시작해볼까?', '링아웃 만나보기에서 실제 서비스를 확인할 수 있어.']
 };
@@ -189,7 +214,9 @@ function updateGuide(progress, flight, landed) {
   if (key !== 'intro') {
     const anchor = window.innerHeight * .6;
     for (const [selector, name] of [['.story', activeChapter], ['.closing','closing']]) {
-      if (document.querySelector(selector).getBoundingClientRect().top <= anchor) key = name;
+      const section = document.querySelector(selector);
+      // 숨겨진 구역(메타버스 탭의 하단 마무리)은 안내 문구 전환에 쓰지 않는다.
+      if (section.getClientRects().length && section.getBoundingClientRect().top <= anchor) key = name;
     }
   }
   if (key !== guideMessageKey) {
@@ -199,7 +226,7 @@ function updateGuide(progress, flight, landed) {
     speechTitle.textContent = title;
     speechBody.textContent = body;
     const storyNote = document.querySelector('.story .inline-guide-copy');
-    if (storyNote && ['overview', 'hypotheses', 'tech'].includes(key)) storyNote.textContent = `${title} ${body}`;
+    if (storyNote && ['overview', 'metaverse', 'hypotheses', 'tech'].includes(key)) storyNote.textContent = `${title} ${body}`;
   }
   window.updateResearchGuide?.(key, dock);
 }

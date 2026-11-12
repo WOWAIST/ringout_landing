@@ -27,7 +27,13 @@ function stopSpotlight(){serviceExplaining=false;researchLightPaused=true;servic
 lightExit.addEventListener('click',stopSpotlight);
 document.addEventListener('keydown',event=>{if(event.key==='Escape')stopSpotlight();});
 let serviceFocusTarget=null;
+const WORLD_URL='http://15.164.93.56/';
+// 메타버스 화면에 있는지: 탭으로 연 경우, 또는 구글 사이트 삽입본처럼 한 페이지에 이어 붙여 스크롤로 도착한 경우.
+const worldPanel=document.querySelector('#panel-metaverse');
+const inWorld=()=>activeChapter==='metaverse'||(!!worldPanel&&!worldPanel.hidden&&worldPanel.getBoundingClientRect().top<innerHeight*.6);
+const seedLabels={default:'씨앗이 설명 듣기. 클릭하면 현재 화면을 설명합니다. 드래그로 이동할 수 있습니다.',metaverse:'링아웃 월드로 이동. 클릭하면 새 창에서 링아웃 월드가 열립니다. 드래그로 이동할 수 있습니다.'};
 function startSeedExplanation(){
+ if(inWorld()){worldFlyer.click();return;}
  if(!guide.classList.contains('is-docked'))return;
  if(activeChapter==='overview'){
   if(serviceExplaining){stopSpotlight();return;}
@@ -56,7 +62,7 @@ dragHandle.addEventListener('pointerdown',event=>{seedPress={x:event.clientX,y:e
 dragHandle.addEventListener('pointermove',event=>{if(seedPress&&Math.hypot(event.clientX-seedPress.x,event.clientY-seedPress.y)>8)seedWasDragged=true;},{capture:true});
 dragHandle.addEventListener('pointercancel',()=>{seedPress=null;seedWasDragged=true;});
 dragHandle.addEventListener('click',event=>{if(seedWasDragged){event.preventDefault();return;}startSeedExplanation();});
-dragHandle.setAttribute('aria-label','씨앗이 설명 듣기. 클릭하면 현재 화면을 설명합니다. 드래그로 이동할 수 있습니다.');
+dragHandle.setAttribute('aria-label',seedLabels.default);
 function setServiceStep(index){
  serviceIndex=index;const step=serviceSteps[index];
  [...buttons.children].forEach((button,i)=>{button.setAttribute('aria-pressed',String(i===index));});
@@ -99,10 +105,67 @@ function placeSpotlight(target){
   guide.style.setProperty('--guide-x',`${x}px`);guide.style.setProperty('--guide-y',`${y}px`);
  }
 }
+// 메타버스 탭 마지막: 서비스 이야기 첫 화면의 씨앗 비행을 거꾸로, 스크롤 진행률에 맞춰 도킹 자리에서 화면 가운데로 날아온다.
+const worldFinale=document.querySelector('#panel-metaverse .world-finale');
+// 씨앗이 자체를 실제 링크로 만든다. window.open은 팝업 차단에 막힐 수 있어 일반 링크 이동을 쓴다.
+const worldFlyer=document.createElement('a');
+worldFlyer.href=WORLD_URL;worldFlyer.target='_blank';worldFlyer.rel='noopener noreferrer';
+worldFlyer.className='seed-flight world-flight';worldFlyer.hidden=true;
+worldFlyer.setAttribute('aria-label','씨앗이를 눌러 링아웃 월드로 이동 (새 창)');
+const worldFlyerImg=new Image();worldFlyerImg.src='./assets/seed-front-original.png';worldFlyerImg.alt='';
+worldFlyer.append(worldFlyerImg);
+document.body.append(worldFlyer);
+const clamp01=v=>Math.max(0,Math.min(1,v));
+function worldCenterLayout(){
+ const mobile=innerWidth<=760;
+ return {mobile,x:innerWidth/2,seedY:innerHeight*(mobile?.6:.64),size:mobile?210:245};
+}
+function placeWorldGuide(key){
+ const rect=inWorld()?worldFinale?.getBoundingClientRect():null;
+ let p=0;
+ if(rect&&rect.height>0&&!manualPosition&&!dragState){
+  // 무대가 페이지의 끝이므로 들어온 뒤에는 맨 아래까지 큰 씨앗이를 유지한다.
+  const enter=clamp01((innerHeight-rect.top)/(innerHeight*.75));
+  p=reducedMotion.matches?(enter>=1?1:0):enter;
+ }
+ const flying=p>0&&p<1, centered=p>=1;
+ guide.classList.toggle('world-in-flight',flying);
+ guide.classList.toggle('world-guide',centered);
+ worldFinale?.classList.toggle('has-seed',p>0);
+ worldFlyer.hidden=!(flying||centered);
+ worldFlyer.classList.toggle('is-over-seed',centered);
+ if(flying){
+  // 도킹 상태의 씨앗 위치(이번 프레임에 updateGuide가 정한 자리)에서 출발한다.
+  const from=seedVideo.getBoundingClientRect();
+  const to=worldCenterLayout();
+  const t=p*p*(3-2*p);
+  const arc=Math.sin(Math.PI*p);
+  const fx=from.left+from.width/2, fy=from.top+from.height/2;
+  worldFlyer.style.left=`${fx+(to.x-fx)*t}px`;
+  worldFlyer.style.top=`${fy+(to.seedY-fy)*t-Math.min(220,innerHeight*.28)*arc}px`;
+  worldFlyer.style.width=`${from.width+(to.size-from.width)*t+from.width*.6*arc}px`;
+  worldFlyer.style.rotate=`${-12*arc}deg`;
+ }
+ if(centered){
+  const to=worldCenterLayout();
+  guide.classList.remove('is-docked');
+  guide.style.setProperty('--guide-width',`${Math.min(360,innerWidth-32)}px`);
+  guide.style.setProperty('--seed-size',`${to.size}px`);
+  guide.style.setProperty('--speech-size',`${to.mobile?26:29}px`);
+  guide.style.setProperty('--guide-x',`${to.x}px`);
+  guide.style.setProperty('--guide-y',`${innerHeight/2}px`);
+  speechLabel.textContent='링아웃 월드로 가는 문';speechTitle.textContent='나를 누르면 바로\n링아웃 월드로!';speechBody.textContent='새 창에서 광장이 열려. 같이 출근 레이스 하자!';
+  // 씨앗 중심이 비행 도착점과 겹치도록 그룹 위치를 보정한다.
+  const seed=seedVideo.getBoundingClientRect();
+  guide.style.setProperty('--guide-y',`${innerHeight/2+(to.seedY-(seed.top+seed.height/2))}px`);
+  worldFlyer.style.left=`${to.x}px`;worldFlyer.style.top=`${to.seedY}px`;worldFlyer.style.width=`${seed.width}px`;worldFlyer.style.rotate='0deg';
+ }
+ dragHint.textContent=inWorld()?'나를 누르면 링아웃 월드로!':'나를 누르면 설명해줄게!';
+}
 const previousResearchGuide=window.updateResearchGuide;
 window.updateResearchGuide=(key,dock)=>{
  previousResearchGuide?.(key,dock);
- if(dock!==1){spotlight.hidden=true;lightExit.hidden=true;serviceGuideNext.hidden=true;return;}
+ if(dock!==1){spotlight.hidden=true;lightExit.hidden=true;serviceGuideNext.hidden=true;guide.classList.remove('world-guide','world-in-flight');worldFlyer.hidden=true;return;}
  if(key==='overview'&&serviceExplaining){
   const step=serviceSteps[serviceIndex];speechLabel.textContent=`앱으로 만나는 링아웃 · ${serviceIndex+1}/6`;speechTitle.textContent=step.title;speechBody.textContent=step.seed;
   guide.classList.add('research-speaking');serviceGuideNext.hidden=false;
@@ -114,10 +177,15 @@ window.updateResearchGuide=(key,dock)=>{
  serviceGuideNext.hidden=true;
  if(key==='hypotheses'&&tourStep>=0&&!researchLightPaused){placeSpotlight(focusPoints[tourStep]);return;}
  spotlight.hidden=true;lightExit.hidden=true;guide.classList.remove('spotlight-guide');
- if(key==='overview'){
+ if(inWorld()&&key!=='closing'){
+  guide.classList.add('seed-inviting','research-speaking');
+  speechLabel.textContent='링아웃 월드';speechTitle.textContent='나를 누르면 링아웃 월드로 데려다줄게!';speechBody.textContent='새 창에서 광장이 열려. 드래그하면 나를 옮길 수도 있어.';
+ }else if(key==='overview'){
   guide.classList.add('seed-inviting','research-speaking');
   speechLabel.textContent='씨앗이의 화면 안내';speechTitle.textContent='나를 누르면 설명을 들을 수 있어.';speechBody.textContent='지금 보고 있는 화면을 함께 살펴보자. 드래그하면 나를 옮길 수도 있어.';
  }else{guide.classList.remove('seed-inviting');}
+ placeWorldGuide(key);
+ dragHandle.setAttribute('aria-label',inWorld()?seedLabels.metaverse:seedLabels.default);
 };
 setServiceStep(0);
 

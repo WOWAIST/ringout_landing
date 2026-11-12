@@ -7,7 +7,7 @@ await copyFile('assets/three.module.js', 'dist/assets/three.module.js');
 for (const name of ['seed-back-v1.png', 'seed-front-original.png']) await copyFile(`assets/${name}`, `dist/assets/${name}`);
 await copyFile('assets/PretendardVariable.woff2', 'dist/assets/PretendardVariable.woff2');
 await copyFile('assets/Pretendard-LICENSE.txt', 'dist/assets/Pretendard-LICENSE.txt');
-for (const name of ['ringout-mockup-alarm-setting.png','ringout-mockup-alarm-screen.png','ringout-mockup-destination-in-progress.png','ringout-group-activity.png','ringout-records-daily.png','ringout-records-calendar.png','ringout-homepage.png','hoi-origin-comic.png','ringout-alarm-flow.svg','arti-caricature.png','hoi-caricature.png']) await copyFile(`assets/${name}`, `dist/assets/${name}`);
+for (const name of ['ringout-mockup-alarm-setting.png','ringout-mockup-alarm-screen.png','ringout-mockup-destination-in-progress.png','ringout-group-activity.png','ringout-records-daily.png','ringout-records-calendar.png','ringout-homepage.png','hoi-origin-comic.png','ringout-alarm-flow.svg','arti-caricature.png','hoi-caricature.png','ringout-world-plaza.webp','ringout-world-race-lobby-full.jpg','ringout-world-race-wakeup.jpg','ringout-world-race-phone-destination.jpg','ringout-world-race-result.jpg','ringout-world-tree-empty.jpg']) await copyFile(`assets/${name}`, `dist/assets/${name}`);
 console.log('Static site built in dist/');
 
 const template = await readFile('index.html', 'utf8');

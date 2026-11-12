@@ -17,6 +17,7 @@ http://127.0.0.1:5173 에서 확인합니다. Python 3와 Node.js가 필요합�
 
 - `index.html`: 공통 페이지 구조와 섹션 포함 위치
 - `sections/service-story.html`: 서비스 이야기
+- `sections/metaverse.html`: 메타버스(링아웃 월드) 방문 안내. 서비스 이야기 하단의 ‘메타버스로 이동’ 버튼(`data-open-chapter`)으로도 열립니다.
 - `sections/hypothesis-validation.html`: 가설 검증
 - `sections/technical-challenges.html`: 기술적 도전
 - `build.mjs`: 섹션을 합쳐 정적 배포 HTML 생성
@@ -25,7 +26,7 @@ http://127.0.0.1:5173 에서 확인합니다. Python 3와 Node.js가 필요합�
 - `favicon.svg`: 데모 페이지 아이콘
 - `nginx.conf.example`: EC2 배포용 Nginx 설정 예시
 
-`#panel-overview`, `#panel-hypotheses`, `#panel-tech`로 각 이야기를 바로 여는 링크를 공유할 수 있습니다. 각 이야기의 스크롤 위치는 페이지를 열어 둔 동안 따로 유지됩니다. 기존 `?tab=…#story` 링크도 연결됩니다.
+`#panel-overview`, `#panel-metaverse`, `#panel-hypotheses`, `#panel-tech`로 각 이야기를 바로 여는 링크를 공유할 수 있습니다. 각 이야기의 스크롤 위치는 페이지를 열어 둔 동안 따로 유지됩니다. 기존 `?tab=…#story` 링크도 연결됩니다.
 가설 검증 섹션은 팀이 공유한 실제 실험 기록을 반영했습니다. 기술적 도전 섹션에는 가상 사례와 iOS 잠금 화면 알람 해제·미션 복구 사례가 함께 있습니다. iOS 사례에는 개발 검증 빌드와 이후 설정 적용 빌드에서 각각 확인한 범위를 명시했습니다.
 오전 사용 관측은 이벤트 단위의 기술적 결과이며 사용자 비율이나 사용 목적을 뜻하지 않습니다.
 모임 비교는 33/51건과 2/7건의 초기 관측으로, 인과관계나 통계적 유의성을 주장하지 않습니다.
@@ -40,6 +41,22 @@ Pretendard Variable을 로컬 assets에서 제공합니다. 글꼴 라이선스�
 `npm run build` 후 `dist/` 내용 전체를 `/var/www/ringout_landing`에 복사하고,
 예시 설정의 도메인을 변경해 Nginx에 적용합니다. Node/Python 실행 서버는 배포 시 필요 없습니다.
 HTTPS 인증서는 실제 도메인과 배포 환경에서 별도 설정합니다.
+
+## 구글 사이트 배포 (코드 삽입)
+
+```sh
+npm run build:gsites
+```
+
+`dist/google-sites-embed.html`에 구글 사이트의 **삽입 → 코드 삽입**에 붙여 넣을 단일 HTML이 생성됩니다.
+
+- 삽입본은 원본과 같은 탭 구성입니다: **서비스 이야기 | 메타버스**. 서비스 이야기 하단의 ‘메타버스로 이동’ 버튼으로 메타버스 탭을 열고, 메타버스 탭 마지막 씨앗이를 누르면 링아웃 월드가 새 창으로 열립니다. 가설 검증·기술적 도전 섹션과 탭 버튼은 빠집니다. `npm run build`로 만드는 dist 사이트에는 그대로 있습니다.
+- 구글 사이트는 삽입 코드 앞에 `<base target="_blank">`와, `document` 캡처 단계에서 모든 `#링크` 클릭을 가로채 `stopPropagation`하는 스크립트를 넣습니다. 그래서 탭·‘메타버스로 이동’ 같은 같은 페이지 안 `#링크`는 `app.js`가 그보다 먼저 실행되는 `window` 캡처 단계에서 처리합니다. 주소 변경(`history.pushState`)이 막혀도 탭 전환은 계속됩니다.
+- CSS와 JS는 HTML 안에 포함됩니다. 이미지·영상·폰트·Three.js는 공개 GitHub 저장소(`WOWAIST/ringout_landing`)를 jsDelivr CDN으로 불러옵니다.
+- 자산 주소는 빌드 시점의 커밋 SHA로 고정됩니다. **assets 변경은 커밋하고 푸시한 뒤 빌드**하세요. 푸시하지 않은 커밋이나 커밋하지 않은 assets가 있으면 경고가 나옵니다.
+- 다른 곳에 자산을 올렸다면 `ASSET_BASE=https://example.com/ringout/ npm run build:gsites`로 주소를 바꿉니다. 이 주소 아래에 `assets/` 폴더가 있어야 합니다.
+- 구글 사이트는 삽입 코드를 고정 높이 iframe 안에 표시합니다. 페이지는 iframe 안에서 스크롤되므로 삽입 블록을 페이지 너비·높이에 맞게 최대한 크게 늘리세요.
+- 붙여 넣기 전 확인: `python3 -m http.server 5174 --directory dist` 실행 후 http://127.0.0.1:5174/gsites-preview.html 에서 iframe 안의 동작을 봅니다.
 
 ## 스크롤 인트로와 빌드
 
