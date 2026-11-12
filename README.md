@@ -41,6 +41,21 @@ Pretendard Variable을 로컬 assets에서 제공합니다. 글꼴 라이선스�
 예시 설정의 도메인을 변경해 Nginx에 적용합니다. Node/Python 실행 서버는 배포 시 필요 없습니다.
 HTTPS 인증서는 실제 도메인과 배포 환경에서 별도 설정합니다.
 
+## 구글 사이트 배포 (코드 삽입)
+
+```sh
+npm run build:gsites
+```
+
+`dist/google-sites-embed.html`에 구글 사이트의 **삽입 → 코드 삽입**에 붙여 넣을 단일 HTML이 생성됩니다.
+
+- 삽입본에는 서비스 이야기와 메타버스 탭만 들어갑니다. 가설 검증·기술적 도전 섹션과 탭 버튼은 빠집니다. `npm run build`로 만드는 dist 사이트에는 그대로 있습니다.
+- CSS와 JS는 HTML 안에 포함됩니다. 이미지·영상·폰트·Three.js는 공개 GitHub 저장소(`WOWAIST/ringout_landing`)를 jsDelivr CDN으로 불러옵니다.
+- 자산 주소는 빌드 시점의 커밋 SHA로 고정됩니다. **assets 변경은 커밋하고 푸시한 뒤 빌드**하세요. 푸시하지 않은 커밋이나 커밋하지 않은 assets가 있으면 경고가 나옵니다.
+- 다른 곳에 자산을 올렸다면 `ASSET_BASE=https://example.com/ringout/ npm run build:gsites`로 주소를 바꿉니다. 이 주소 아래에 `assets/` 폴더가 있어야 합니다.
+- 구글 사이트는 삽입 코드를 고정 높이 iframe 안에 표시합니다. 페이지는 iframe 안에서 스크롤되므로 삽입 블록을 페이지 너비·높이에 맞게 최대한 크게 늘리세요.
+- 붙여 넣기 전 확인: `python3 -m http.server 5174 --directory dist` 실행 후 http://127.0.0.1:5174/gsites-preview.html 에서 iframe 안의 동작을 봅니다.
+
 ## 스크롤 인트로와 빌드
 
 검은 양쪽 문이 스크롤 진행률에 맞춰 열리고, 역방향으로 스크롤하면 닫힙니다. 바로 만나보기 버튼으로 건너뛸 수 있습니다. 동작 줄이기 설정에서는 인트로를 생략합니다. 캐릭터 WebM은 무음 자동 반복 재생합니다. 동작 줄이기 설정에서는 영상 재생을 중지합니다.
