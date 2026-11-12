@@ -34,14 +34,25 @@ for (const [marker, file] of [...html.matchAll(/<!-- include: (sections\/[a-z-]+
   const section = file in EXCLUDED_SECTIONS ? EXCLUDED_SECTIONS[file] : (await read(file)).trimEnd();
   html = html.replace(marker, () => section);
 }
+// 구글 사이트 삽입본은 탭 전환 없이 한 페이지로 이어 붙인다: 서비스 이야기 → 메타버스.
+// 탭 버튼은 서비스 이야기 하나만 남겨 숨기고, 메타버스 패널은 처음부터 보이게 한다.
+// ‘메타버스로 이동’ 버튼은 같은 페이지의 메타버스 위치로 스크롤한다.
 const navBefore = html;
-html = html.replace(/\n<a id="chapter-(?:hypotheses|tech)" [^\n]*<\/a>/g, '');
-if (html === navBefore || /chapter-(?:hypotheses|tech)/.test(html)) throw new Error('탭 버튼 제거 실패: index.html의 story-nav 구조를 확인하세요.');
+html = html.replace(/\n<a id="chapter-(?:metaverse|hypotheses|tech)" [^\n]*<\/a>/g, '');
+html = html.replace('<nav class="story-nav"', '<nav class="story-nav" hidden');
+html = html.replace('<section class="story-chapter" id="panel-metaverse" aria-labelledby="chapter-metaverse" tabindex="-1" hidden>', '<section class="story-chapter" id="panel-metaverse" aria-labelledby="world-intro-title" tabindex="-1">');
+html = html.replaceAll(' data-open-chapter', '');
+if (html === navBefore || /chapter-(?:metaverse|hypotheses|tech)/.test(html) || /id="panel-metaverse"[^>]*hidden/.test(html) || html.includes('data-open-chapter')) throw new Error('한 페이지 구성 실패: index.html·섹션 구조를 확인하세요.');
 const alarmFlow = (await read('assets/ringout-alarm-flow.svg')).trim();
 html = html.replace('<!-- include: assets/ringout-alarm-flow.svg -->', () => alarmFlow);
 
 // 외부 CSS·JS 연결을 제거하고 문서 안에 넣는다.
-const styles = [await read('styles.css'), await read('theme.css')].map(absolutize).join('\n');
+// 한 페이지 구성에 맞춘 보정: 탭 줄 높이 제거, 씨앗이 무대에서 페이지가 끝나도록 하단 마무리·푸터 숨김.
+const combinedCss = `html{--story-nav-height:0px}.story-nav[hidden]{display:none}
+#panel-metaverse{padding-top:0;border-top:1px solid var(--line);margin-top:24px}
+:is(.closing,footer,.story>.inline-guide-copy){display:none}.story{padding-bottom:0}
+html{scroll-behavior:smooth}`;
+const styles = [await read('styles.css'), await read('theme.css'), combinedCss].map(absolutize).join('\n');
 html = html.replace(/<link rel="stylesheet" href="\.\/[a-z]+\.css">/g, '');
 html = html.replace(/<script (?:type="module" )?src="\.\/[a-z0-9]+\.js"(?: defer)?><\/script>/g, '');
 html = html.replace('</head>', () => `<style>\n${styles}\n</style></head>`);

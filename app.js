@@ -38,10 +38,13 @@ function openChapterLink(event, chapter) {
   if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
   event.preventDefault();
   if (location.hash !== `#${chapter.id}`) {
-    const url = new URL(location.href);
-    url.searchParams.delete('tab');
-    url.hash = chapter.id;
-    history.pushState(null, '', url);
+    // 구글 사이트처럼 iframe(srcdoc)에 삽입되면 주소 변경이 막힐 수 있다. 실패해도 탭 전환은 계속한다.
+    try {
+      const url = new URL(location.href);
+      url.searchParams.delete('tab');
+      url.hash = chapter.id;
+      history.pushState(null, '', url);
+    } catch {}
   }
   if (chapter !== selectedChapter || entrance.getBoundingClientRect().bottom > 0) {
     showChapter(chapter);
@@ -54,6 +57,18 @@ chapterLinks.forEach((link, index) => {
 document.querySelectorAll('a[data-open-chapter]').forEach(link => {
   const chapter = chapters.find(panel => `#${panel.id}` === link.hash);
   if (chapter) link.addEventListener('click', event => openChapterLink(event, chapter));
+});
+// 같은 페이지 안의 #링크는 스크립트로 스크롤한다. srcdoc iframe(구글 사이트 삽입)에서는 #링크가
+// 바깥 페이지 주소로 해석돼 iframe이 다른 문서로 이동해 버리기 때문이다.
+document.addEventListener('click', event => {
+  if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  const link = event.target.closest('a[href^="#"]');
+  if (!link) return;
+  const id = decodeURIComponent(link.getAttribute('href').slice(1));
+  const target = id ? document.getElementById(id) : document.documentElement;
+  if (!target || target.closest('[hidden]')) return;
+  event.preventDefault();
+  target.scrollIntoView({ behavior: reducedMotion.matches ? 'auto' : 'smooth', block: 'start' });
 });
 document.querySelector('.skip').addEventListener('click', event => {
   openChapterLink(event, chapters[0]);
