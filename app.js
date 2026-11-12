@@ -49,6 +49,10 @@ function openChapterLink(event, chapter) {
 chapterLinks.forEach((link, index) => {
   link.addEventListener('click', event => openChapterLink(event, chapters[index]));
 });
+document.querySelectorAll('a[data-open-chapter]').forEach(link => {
+  const chapter = chapters.find(panel => `#${panel.id}` === link.hash);
+  if (chapter) link.addEventListener('click', event => openChapterLink(event, chapter));
+});
 document.querySelector('.skip').addEventListener('click', event => {
   openChapterLink(event, chapters[0]);
   if (event.defaultPrevented) chapters[0].focus({ preventScroll: true });
@@ -145,6 +149,7 @@ const guideMessages = {
   journey: ['이렇게 시작하면 돼', '목표를 정하고, 출발하고, 도착!', '오늘 밤의 계획을 내일의 첫 행동으로 이어봐.'],
   overview: ['우리가 시작한 질문', '눈을 떴는데, 왜 아직 침대일까?', '링아웃이 기상 이후의 행동에 집중한 이유야.'],
   hypotheses: ['데이터로 확인한 이야기', '최초 알람 울림의 70%가 오전이었어.', '모임 결과는 아직 초기 관측이야. 한계도 같이 살펴봐!'],
+  metaverse: ['링아웃 월드', '나를 누르면 링아웃 월드로 데려다줄게!', '새 창에서 광장이 열려. 드래그하면 나를 옮길 수도 있어.'],
   tech: ['기술적 도전', '안정적인 아침 뒤에는 어떤 고민이 있을까?', '가상 사례와 실제 iOS 알람 복구 사례를 함께 살펴봐.'],
   closing: ['이제 너의 아침으로', '내일의 첫 행동, 같이 시작해볼까?', '링아웃 만나보기에서 실제 서비스를 확인할 수 있어.']
 };
@@ -199,7 +204,7 @@ function updateGuide(progress, flight, landed) {
     speechTitle.textContent = title;
     speechBody.textContent = body;
     const storyNote = document.querySelector('.story .inline-guide-copy');
-    if (storyNote && ['overview', 'hypotheses', 'tech'].includes(key)) storyNote.textContent = `${title} ${body}`;
+    if (storyNote && ['overview', 'metaverse', 'hypotheses', 'tech'].includes(key)) storyNote.textContent = `${title} ${body}`;
   }
   window.updateResearchGuide?.(key, dock);
 }

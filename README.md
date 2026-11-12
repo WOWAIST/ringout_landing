@@ -17,6 +17,7 @@ http://127.0.0.1:5173 에서 확인합니다. Python 3와 Node.js가 필요합�
 
 - `index.html`: 공통 페이지 구조와 섹션 포함 위치
 - `sections/service-story.html`: 서비스 이야기
+- `sections/metaverse.html`: 메타버스(링아웃 월드) 방문 안내. 서비스 이야기 하단의 ‘메타버스로 이동’ 버튼(`data-open-chapter`)으로도 열립니다.
 - `sections/hypothesis-validation.html`: 가설 검증
 - `sections/technical-challenges.html`: 기술적 도전
 - `build.mjs`: 섹션을 합쳐 정적 배포 HTML 생성
@@ -25,7 +26,7 @@ http://127.0.0.1:5173 에서 확인합니다. Python 3와 Node.js가 필요합�
 - `favicon.svg`: 데모 페이지 아이콘
 - `nginx.conf.example`: EC2 배포용 Nginx 설정 예시
 
-`#panel-overview`, `#panel-hypotheses`, `#panel-tech`로 각 이야기를 바로 여는 링크를 공유할 수 있습니다. 각 이야기의 스크롤 위치는 페이지를 열어 둔 동안 따로 유지됩니다. 기존 `?tab=…#story` 링크도 연결됩니다.
+`#panel-overview`, `#panel-metaverse`, `#panel-hypotheses`, `#panel-tech`로 각 이야기를 바로 여는 링크를 공유할 수 있습니다. 각 이야기의 스크롤 위치는 페이지를 열어 둔 동안 따로 유지됩니다. 기존 `?tab=…#story` 링크도 연결됩니다.
 가설 검증 섹션은 팀이 공유한 실제 실험 기록을 반영했습니다. 기술적 도전 섹션에는 가상 사례와 iOS 잠금 화면 알람 해제·미션 복구 사례가 함께 있습니다. iOS 사례에는 개발 검증 빌드와 이후 설정 적용 빌드에서 각각 확인한 범위를 명시했습니다.
 오전 사용 관측은 이벤트 단위의 기술적 결과이며 사용자 비율이나 사용 목적을 뜻하지 않습니다.
 모임 비교는 33/51건과 2/7건의 초기 관측으로, 인과관계나 통계적 유의성을 주장하지 않습니다.

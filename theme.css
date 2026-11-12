@@ -151,16 +151,16 @@ details.principle-row summary .principle-index{font-size:12px;color:#c2461a}
 .principle-row[open] summary{color:#354153}
 
 /* Service story: content follows the reviewed Markdown draft. */
-#panel-overview .service-story-block{padding:56px 0;border-bottom:1px solid var(--line)}
-#panel-overview .service-story-block:last-child{border-bottom:0}
-#panel-overview .service-introduction .story-stage-content>h2,#panel-overview .service-story-block>h3,#panel-overview .story-together h3,#panel-overview .story-origin-intro h3,#panel-overview .story-flow-sequence h3{font-size:clamp(26px,3vw,36px);line-height:1.4;margin:16px 0 24px;letter-spacing:-.03em}
-#panel-overview .service-introduction .story-stage-content>p,#panel-overview .story-together p:not(.experience-eyebrow),#panel-overview .story-origin-intro p,#panel-overview :is(.story-chat-sequence,.story-flow-sequence) .story-stage-content>p{max-width:760px;font-size:16px;line-height:1.9;color:var(--muted);word-break:keep-all;overflow-wrap:anywhere}
-#panel-overview .service-story-block h4{font-size:20px;line-height:1.5;margin:32px 0 12px}
-#panel-overview p.story-emphasis{font-weight:700;color:var(--orange-text);margin-top:28px}
-#panel-overview figure{margin:32px 0 16px}
-#panel-overview .story-homepage img{display:block;width:100%;height:auto;border-radius:16px;border:1px solid #f4d8ca}
-#panel-overview figcaption{font-size:12px;color:var(--muted);line-height:1.7;margin-top:12px}
-#panel-overview .story-link{display:inline-block;font-size:14px;color:var(--orange-text);font-weight:600;margin-top:12px;padding:8px 0}
+:is(#panel-overview,#panel-metaverse) .service-story-block{padding:56px 0;border-bottom:1px solid var(--line)}
+:is(#panel-overview,#panel-metaverse) .service-story-block:last-child{border-bottom:0}
+:is(#panel-overview,#panel-metaverse) .service-introduction .story-stage-content>h2,:is(#panel-overview,#panel-metaverse) .service-story-block>h3,:is(#panel-overview,#panel-metaverse) .story-together h3,:is(#panel-overview,#panel-metaverse) .story-origin-intro h3,:is(#panel-overview,#panel-metaverse) .story-flow-sequence h3{font-size:clamp(26px,3vw,36px);line-height:1.4;margin:16px 0 24px;letter-spacing:-.03em}
+:is(#panel-overview,#panel-metaverse) .service-introduction .story-stage-content>p,:is(#panel-overview,#panel-metaverse) .story-together p:not(.experience-eyebrow),:is(#panel-overview,#panel-metaverse) .story-origin-intro p,:is(#panel-overview,#panel-metaverse) :is(.story-chat-sequence,.story-flow-sequence) .story-stage-content>p{max-width:760px;font-size:16px;line-height:1.9;color:var(--muted);word-break:keep-all;overflow-wrap:anywhere}
+:is(#panel-overview,#panel-metaverse) .service-story-block h4{font-size:20px;line-height:1.5;margin:32px 0 12px}
+:is(#panel-overview,#panel-metaverse) p.story-emphasis{font-weight:700;color:var(--orange-text);margin-top:28px}
+:is(#panel-overview,#panel-metaverse) figure{margin:32px 0 16px}
+:is(#panel-overview,#panel-metaverse) .story-homepage img{display:block;width:100%;height:auto;border-radius:16px;border:1px solid #f4d8ca}
+:is(#panel-overview,#panel-metaverse) figcaption{font-size:12px;color:var(--muted);line-height:1.7;margin-top:12px}
+:is(#panel-overview,#panel-metaverse) .story-link{display:inline-block;font-size:14px;color:var(--orange-text);font-weight:600;margin-top:12px;padding:8px 0}
 #panel-overview .story-comic {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -199,7 +199,7 @@ details.principle-row summary .principle-index{font-size:12px;color:#c2461a}
     translate: 0 24px;
     pointer-events: none;
   }
-  #panel-overview .service-introduction .story-homepage img {
+  #panel-overview .service-introduction .story-homepage img, #panel-metaverse .world-introduction .story-homepage img {
     max-height: 30dvh;
     width: auto;
     max-width: 100%;
@@ -316,15 +316,15 @@ details.principle-row summary .principle-index{font-size:12px;color:#c2461a}
 #panel-overview .story-alarm-flow{display:block;width:100%;height:auto;margin-top:24px}
 #panel-overview .app-experience{margin:48px 0 0}
 #panel-overview .service-film{margin:56px 0 0}
-#panel-overview .story-usage-steps{padding-left:22px;font-size:14px;line-height:1.9;color:var(--muted)}
-#panel-overview .story-usage-steps li{padding-left:4px;margin:12px 0;word-break:keep-all}
-#panel-overview .story-together{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:48px}
-#panel-overview .story-together h4{font-size:18px}
-#panel-overview p.story-group-highlight{background:#fff3ec;border:1px solid #f4d8ca;border-radius:16px;padding:24px;margin-top:28px;color:var(--ink)}
-#panel-overview .story-group-highlight strong{color:var(--orange-text);font-size:24px}
-#panel-overview .story-group-screen{text-align:center;border-radius:20px;padding:24px;background:#f5f6f8}
-#panel-overview .story-group-screen img{display:block;width:100%;height:400px;object-fit:contain}
-@media(max-width:760px){#panel-overview .service-story-block{padding:36px 0}#panel-overview .service-introduction .story-stage-content>p,#panel-overview .story-together p:not(.experience-eyebrow),#panel-overview .story-origin-intro p,#panel-overview :is(.story-chat-sequence,.story-flow-sequence) .story-stage-content>p{font-size:15px}#panel-overview .story-together{grid-template-columns:1fr;gap:20px}#panel-overview .story-speech p{font-size:15px}#panel-overview .app-experience{margin-top:32px}#panel-overview .service-film{margin-top:36px}#panel-overview .story-group-screen img{height:340px}}
+:is(#panel-overview,#panel-metaverse) .story-usage-steps{padding-left:22px;font-size:14px;line-height:1.9;color:var(--muted)}
+:is(#panel-overview,#panel-metaverse) .story-usage-steps li{padding-left:4px;margin:12px 0;word-break:keep-all}
+:is(#panel-overview,#panel-metaverse) .story-together{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:48px}
+:is(#panel-overview,#panel-metaverse) .story-together h4{font-size:18px}
+:is(#panel-overview,#panel-metaverse) p.story-group-highlight{background:#fff3ec;border:1px solid #f4d8ca;border-radius:16px;padding:24px;margin-top:28px;color:var(--ink)}
+:is(#panel-overview,#panel-metaverse) .story-group-highlight strong{color:var(--orange-text);font-size:24px}
+:is(#panel-overview,#panel-metaverse) .story-group-screen{text-align:center;border-radius:20px;padding:24px;background:#f5f6f8}
+:is(#panel-overview,#panel-metaverse) .story-group-screen img{display:block;width:100%;height:400px;object-fit:contain}
+@media(max-width:760px){:is(#panel-overview,#panel-metaverse) .service-story-block{padding:36px 0}:is(#panel-overview,#panel-metaverse) .service-introduction .story-stage-content>p,:is(#panel-overview,#panel-metaverse) .story-together p:not(.experience-eyebrow),:is(#panel-overview,#panel-metaverse) .story-origin-intro p,:is(#panel-overview,#panel-metaverse) :is(.story-chat-sequence,.story-flow-sequence) .story-stage-content>p{font-size:15px}:is(#panel-overview,#panel-metaverse) .story-together{grid-template-columns:1fr;gap:20px}:is(#panel-overview,#panel-metaverse) .story-speech p{font-size:15px}:is(#panel-overview,#panel-metaverse) .app-experience{margin-top:32px}:is(#panel-overview,#panel-metaverse) .service-film{margin-top:36px}:is(#panel-overview,#panel-metaverse) .story-group-screen img{height:340px}}
 
 /* Chapter changes restore their own scroll position. */
 html{overflow-anchor:none;--story-nav-height:57px}
@@ -336,7 +336,7 @@ html{overflow-anchor:none;--story-nav-height:57px}
 .story{padding-top:0}
 .story-chapter{scroll-margin-top:38px}
 .entrance[hidden],.story-chapter[hidden]{display:none}
-.story-chapter:not(#panel-overview){padding-top:28px}
+.story-chapter:not(#panel-overview,#panel-metaverse){padding-top:28px}
 .story .journey{margin-inline:0}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 
@@ -353,3 +353,40 @@ body > .intro-character.is-awaiting-landing {
   height: auto;
   pointer-events: none;
 }
+
+/* 메타버스(링아웃 월드): 서비스 이야기와 같은 블록 구성 */
+.story-metaverse-cta{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:64px 0 0;padding:32px 40px;background:var(--orange-soft);border:1px solid #f7d1bd;border-radius:16px}
+.story-metaverse-cta h3{font-size:22px;line-height:1.4;font-weight:700;margin:0 0 6px}.story-metaverse-cta p{margin:0;font-size:15px;line-height:1.6;color:var(--muted)}
+.story-metaverse-cta .primary{margin-top:0;flex-shrink:0;gap:24px}
+#panel-metaverse .world-introduction .story-stage-content>h2{font-size:clamp(26px,3vw,36px);line-height:1.4;margin:16px 0 24px;letter-spacing:-.03em}
+#panel-metaverse .service-story-block>h3{margin-bottom:16px}
+#panel-metaverse .world-introduction .story-stage-content>p:not(.story-emphasis),#panel-metaverse p.world-lead{max-width:760px;font-size:16px;line-height:1.9;color:var(--muted);word-break:keep-all}
+#panel-metaverse .world-introduction .story-stage-content>p.story-emphasis{font-size:16px;line-height:1.9}
+#panel-metaverse .world-shots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px 24px;margin:32px 0 0;padding:0;list-style:none}
+#panel-metaverse .world-shots figure{margin:0}
+#panel-metaverse .world-shots img{display:block;width:100%;height:auto;border-radius:16px;border:1px solid #f4d8ca}
+#panel-metaverse .world-shots figcaption{font-size:14px;line-height:1.7;color:var(--ink);margin-top:12px;word-break:keep-all}
+#panel-metaverse .world-shots figcaption b{color:var(--orange-text);margin-right:6px}
+#panel-metaverse kbd{font:inherit;font-size:12px;font-weight:600;padding:1px 6px;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;background:#fff;color:var(--ink)}
+#panel-metaverse .story-together h3{margin-top:0}
+#panel-metaverse .world-tree-screen img{height:auto;max-height:400px}
+#panel-metaverse .world-maps{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 0;padding:0;list-style:none}
+#panel-metaverse .world-maps li{padding:8px 14px;border-radius:999px;background:var(--map-paper);border:1px solid #0000000f;font-size:14px;font-weight:600}
+.map-pangyo{--map-paper:#FBFAF6}.map-rainy{--map-paper:#E8EDF2}.map-autumn{--map-paper:#FBF1E1}.map-snow{--map-paper:#F2F6FA}
+#panel-metaverse .tree-stages{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:24px 0 0;padding:0;list-style:none}
+#panel-metaverse .tree-stages li{display:flex;align-items:center;gap:6px;font-size:15px;font-weight:600}#panel-metaverse .tree-stages span{font-size:24px}
+#panel-metaverse .tree-stages li+li:before{content:'→';margin:0 4px;color:var(--orange-text);font-weight:700}
+@media(max-width:760px){#panel-metaverse .world-introduction .story-stage-content>p:not(.story-emphasis),#panel-metaverse p.world-lead{font-size:15px}#panel-metaverse .world-shots{grid-template-columns:1fr;gap:24px}}
+/* 메타버스 마지막: 씨앗이가 가운데로 뛰쳐나오는 무대 */
+#panel-metaverse .world-finale{position:relative;min-height:135vh;min-height:135svh;margin:0 0 24px;border-radius:24px;background:radial-gradient(ellipse at 50% 62%,#fde8dd 0 22%,#fff6f1 48%,#fff 75%);display:flex;align-items:flex-end;justify-content:center;padding-bottom:48px}
+#panel-metaverse .world-finale-link{font-size:14px;font-weight:600;color:var(--orange-text);padding:8px 0;transition:opacity .3s}
+#panel-metaverse .world-finale.has-seed .world-finale-link{opacity:0;pointer-events:none}
+.visually-hidden{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+body>.intro-character.world-guide{z-index:70!important;opacity:1;filter:none}
+body>.intro-character.world-guide .speech{background:#fff!important;opacity:1}
+body>.intro-character.world-guide .speech h2{white-space:pre-line}
+body>.intro-character.world-guide :is(.intro-kicker,.scroll-invitation,.guide-toggle,.drag-hint,.guide-tour-next){display:none!important}
+body>.intro-character:is(.world-guide,.world-in-flight){transition:none!important}
+body>.intro-character.world-in-flight{visibility:hidden;pointer-events:none}
+.world-flight{z-index:71}
+body>.intro-character.world-guide .seed-drag-handle{pointer-events:auto;cursor:pointer}
