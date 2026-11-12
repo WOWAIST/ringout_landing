@@ -30,7 +30,7 @@ let serviceFocusTarget=null;
 const WORLD_URL='http://15.164.93.56/';
 const seedLabels={default:'씨앗이 설명 듣기. 클릭하면 현재 화면을 설명합니다. 드래그로 이동할 수 있습니다.',metaverse:'링아웃 월드로 이동. 클릭하면 새 창에서 링아웃 월드가 열립니다. 드래그로 이동할 수 있습니다.'};
 function startSeedExplanation(){
- if(activeChapter==='metaverse'){window.open(WORLD_URL,'_blank','noopener');return;}
+ if(activeChapter==='metaverse'){worldFlyer.click();return;}
  if(!guide.classList.contains('is-docked'))return;
  if(activeChapter==='overview'){
   if(serviceExplaining){stopSpotlight();return;}
@@ -104,8 +104,13 @@ function placeSpotlight(target){
 }
 // 메타버스 탭 마지막: 서비스 이야기 첫 화면의 씨앗 비행을 거꾸로, 스크롤 진행률에 맞춰 도킹 자리에서 화면 가운데로 날아온다.
 const worldFinale=document.querySelector('#panel-metaverse .world-finale');
-const worldFlyer=new Image();
-worldFlyer.src='./assets/seed-front-original.png';worldFlyer.alt='';worldFlyer.className='seed-flight world-flight';worldFlyer.hidden=true;
+// 씨앗이 자체를 실제 링크로 만든다. window.open은 팝업 차단에 막힐 수 있어 일반 링크 이동을 쓴다.
+const worldFlyer=document.createElement('a');
+worldFlyer.href=WORLD_URL;worldFlyer.target='_blank';worldFlyer.rel='noopener noreferrer';
+worldFlyer.className='seed-flight world-flight';worldFlyer.hidden=true;
+worldFlyer.setAttribute('aria-label','씨앗이를 눌러 링아웃 월드로 이동 (새 창)');
+const worldFlyerImg=new Image();worldFlyerImg.src='./assets/seed-front-original.png';worldFlyerImg.alt='';
+worldFlyer.append(worldFlyerImg);
 document.body.append(worldFlyer);
 const clamp01=v=>Math.max(0,Math.min(1,v));
 function worldCenterLayout(){
@@ -124,7 +129,8 @@ function placeWorldGuide(key){
  guide.classList.toggle('world-in-flight',flying);
  guide.classList.toggle('world-guide',centered);
  worldFinale?.classList.toggle('has-seed',p>0);
- worldFlyer.hidden=!flying;
+ worldFlyer.hidden=!(flying||centered);
+ worldFlyer.classList.toggle('is-over-seed',centered);
  if(flying){
   // 도킹 상태의 씨앗 위치(이번 프레임에 updateGuide가 정한 자리)에서 출발한다.
   const from=seedVideo.getBoundingClientRect();
@@ -149,6 +155,7 @@ function placeWorldGuide(key){
   // 씨앗 중심이 비행 도착점과 겹치도록 그룹 위치를 보정한다.
   const seed=seedVideo.getBoundingClientRect();
   guide.style.setProperty('--guide-y',`${innerHeight/2+(to.seedY-(seed.top+seed.height/2))}px`);
+  worldFlyer.style.left=`${to.x}px`;worldFlyer.style.top=`${to.seedY}px`;worldFlyer.style.width=`${seed.width}px`;worldFlyer.style.rotate='0deg';
  }
  dragHint.textContent=activeChapter==='metaverse'?'나를 누르면 링아웃 월드로!':'나를 누르면 설명해줄게!';
 }

@@ -388,5 +388,9 @@ body>.intro-character.world-guide .speech h2{white-space:pre-line}
 body>.intro-character.world-guide :is(.intro-kicker,.scroll-invitation,.guide-toggle,.drag-hint,.guide-tour-next){display:none!important}
 body>.intro-character:is(.world-guide,.world-in-flight){transition:none!important}
 body>.intro-character.world-in-flight{visibility:hidden;pointer-events:none}
-.world-flight{z-index:71}
+.world-flight{z-index:72;pointer-events:auto;cursor:pointer;border-radius:50%}
+.world-flight:not([hidden]){display:block}
+.world-flight img{display:block;width:100%;height:auto}
+.world-flight.is-over-seed img{opacity:0}
+.world-flight:focus-visible{outline:3px solid var(--orange);outline-offset:6px}
 body>.intro-character.world-guide .seed-drag-handle{pointer-events:auto;cursor:pointer}
