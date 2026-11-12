@@ -3,6 +3,7 @@ const chapterLinks = [...storyNav.querySelectorAll('a')];
 const chapters = chapterLinks.map(link => document.getElementById(link.hash.slice(1)));
 let selectedChapter = chapters[0];
 let activeChapter = 'overview';
+document.body.dataset.chapter = activeChapter;
 const chapterOffsets = new Map();
 
 function showChapter(chapter) {
@@ -10,6 +11,7 @@ function showChapter(chapter) {
     chapterOffsets.set(selectedChapter, Math.max(0, window.scrollY - entrance.offsetHeight));
     selectedChapter = chapter;
     activeChapter = chapter.id.slice('panel-'.length);
+    document.body.dataset.chapter = activeChapter;
     entrance.hidden = chapter !== chapters[0];
     chapters.forEach((panel, index) => {
       const selected = panel === chapter;
@@ -194,7 +196,9 @@ function updateGuide(progress, flight, landed) {
   if (key !== 'intro') {
     const anchor = window.innerHeight * .6;
     for (const [selector, name] of [['.story', activeChapter], ['.closing','closing']]) {
-      if (document.querySelector(selector).getBoundingClientRect().top <= anchor) key = name;
+      const section = document.querySelector(selector);
+      // 숨겨진 구역(메타버스 탭의 하단 마무리)은 안내 문구 전환에 쓰지 않는다.
+      if (section.getClientRects().length && section.getBoundingClientRect().top <= anchor) key = name;
     }
   }
   if (key !== guideMessageKey) {

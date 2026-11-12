@@ -378,7 +378,7 @@ body > .intro-character.is-awaiting-landing {
 #panel-metaverse .tree-stages li+li:before{content:'→';margin:0 4px;color:var(--orange-text);font-weight:700}
 @media(max-width:760px){#panel-metaverse .world-introduction .story-stage-content>p:not(.story-emphasis),#panel-metaverse p.world-lead{font-size:15px}#panel-metaverse .world-shots{grid-template-columns:1fr;gap:24px}}
 /* 메타버스 마지막: 씨앗이가 가운데로 뛰쳐나오는 무대 */
-#panel-metaverse .world-finale{position:relative;min-height:135vh;min-height:135svh;margin:0 0 24px;border-radius:24px;background:radial-gradient(ellipse at 50% 62%,#fde8dd 0 22%,#fff6f1 48%,#fff 75%);display:flex;align-items:flex-end;justify-content:center;padding-bottom:48px}
+#panel-metaverse .world-finale{position:relative;min-height:110vh;min-height:110svh;margin:0;border-radius:24px;background:radial-gradient(ellipse at 50% 62%,#fde8dd 0 22%,#fff6f1 48%,#fff 75%);display:flex;align-items:flex-end;justify-content:center;padding-bottom:48px}
 #panel-metaverse .world-finale-link{font-size:14px;font-weight:600;color:var(--orange-text);padding:8px 0;transition:opacity .3s}
 #panel-metaverse .world-finale.has-seed .world-finale-link{opacity:0;pointer-events:none}
 .visually-hidden{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -394,3 +394,7 @@ body>.intro-character.world-in-flight{visibility:hidden;pointer-events:none}
 .world-flight.is-over-seed img{opacity:0}
 .world-flight:focus-visible{outline:3px solid var(--orange);outline-offset:6px}
 body>.intro-character.world-guide .seed-drag-handle{pointer-events:auto;cursor:pointer}
+
+/* 메타버스 탭은 씨앗이 무대에서 끝난다: 하단 마무리와 푸터를 숨기고 아래 여백을 없앤다. */
+body[data-chapter="metaverse"] :is(.closing,footer,.story>.inline-guide-copy){display:none}
+body[data-chapter="metaverse"] .story{padding-bottom:0}

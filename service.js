@@ -121,9 +121,9 @@ function placeWorldGuide(key){
  const rect=activeChapter==='metaverse'?worldFinale?.getBoundingClientRect():null;
  let p=0;
  if(rect&&rect.height>0&&!manualPosition&&!dragState){
+  // 무대가 페이지의 끝이므로 들어온 뒤에는 맨 아래까지 큰 씨앗이를 유지한다.
   const enter=clamp01((innerHeight-rect.top)/(innerHeight*.75));
-  const exit=clamp01((rect.bottom-innerHeight*.8)/(innerHeight*.35));
-  p=reducedMotion.matches?(enter>=1&&exit>=1?1:0):Math.min(enter,exit);
+  p=reducedMotion.matches?(enter>=1?1:0):enter;
  }
  const flying=p>0&&p<1, centered=p>=1;
  guide.classList.toggle('world-in-flight',flying);
@@ -177,7 +177,7 @@ window.updateResearchGuide=(key,dock)=>{
  if(key==='overview'){
   guide.classList.add('seed-inviting','research-speaking');
   speechLabel.textContent='씨앗이의 화면 안내';speechTitle.textContent='나를 누르면 설명을 들을 수 있어.';speechBody.textContent='지금 보고 있는 화면을 함께 살펴보자. 드래그하면 나를 옮길 수도 있어.';
- }else if(activeChapter==='metaverse'&&key!=='closing'){
+ }else if(activeChapter==='metaverse'){
   guide.classList.add('seed-inviting','research-speaking');
   speechLabel.textContent='링아웃 월드';speechTitle.textContent='나를 누르면 링아웃 월드로 데려다줄게!';speechBody.textContent='새 창에서 광장이 열려. 드래그하면 나를 옮길 수도 있어.';
  }else{guide.classList.remove('seed-inviting');}
