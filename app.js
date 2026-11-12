@@ -51,29 +51,32 @@ function openChapterLink(event, chapter) {
   }
 }
 
-chapterLinks.forEach((link, index) => {
-  link.addEventListener('click', event => openChapterLink(event, chapters[index]));
-});
-document.querySelectorAll('a[data-open-chapter]').forEach(link => {
-  const chapter = chapters.find(panel => `#${panel.id}` === link.hash);
-  if (chapter) link.addEventListener('click', event => openChapterLink(event, chapter));
-});
-// 같은 페이지 안의 #링크는 스크립트로 스크롤한다. srcdoc iframe(구글 사이트 삽입)에서는 #링크가
-// 바깥 페이지 주소로 해석돼 iframe이 다른 문서로 이동해 버리기 때문이다.
-document.addEventListener('click', event => {
+// 같은 페이지 안의 #링크(탭, ‘메타버스로 이동’, 본문 건너뛰기 등)는 한곳에서 처리한다.
+// 구글 사이트 삽입 코드에는 document 캡처 단계에서 모든 #링크의 클릭을 가로채
+// stopPropagation하는 스크립트가 들어간다. window 캡처 단계가 그보다 먼저 실행되므로
+// 여기서 처리하고 전파를 멈춘다. 일반 사이트에서도 같은 방식으로 동작한다.
+window.addEventListener('click', event => {
   if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-  const link = event.target.closest('a[href^="#"]');
+  const link = event.target instanceof Element ? event.target.closest('a[href^="#"]') : null;
   if (!link) return;
-  const id = decodeURIComponent(link.getAttribute('href').slice(1));
+  let id = link.getAttribute('href').slice(1);
+  try { id = decodeURIComponent(id); } catch {}
+  const chapter = chapters.find(panel => panel.id === id);
+  const isChapterLink = chapter && (chapterLinks.includes(link) || link.hasAttribute('data-open-chapter') || link.classList.contains('skip'));
+  if (isChapterLink) {
+    event.stopImmediatePropagation();
+    openChapterLink(event, chapter);
+    if (link.classList.contains('skip')) chapters[0].focus({ preventScroll: true });
+    // 탭 버튼 클릭을 기다리는 다른 안내(설명·투어 종료)도 그대로 받도록 알린다.
+    if (chapterLinks.includes(link)) storyNav.dispatchEvent(new Event('click'));
+    return;
+  }
   const target = id ? document.getElementById(id) : document.documentElement;
   if (!target || target.closest('[hidden]')) return;
   event.preventDefault();
+  event.stopImmediatePropagation();
   target.scrollIntoView({ behavior: reducedMotion.matches ? 'auto' : 'smooth', block: 'start' });
-});
-document.querySelector('.skip').addEventListener('click', event => {
-  openChapterLink(event, chapters[0]);
-  if (event.defaultPrevented) chapters[0].focus({ preventScroll: true });
-});
+}, true);
 window.addEventListener('popstate', () => {
   const chapter = chapterFromUrl();
   if (chapter && chapter !== selectedChapter) showChapter(chapter);
