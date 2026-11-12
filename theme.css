@@ -355,9 +355,6 @@ body > .intro-character.is-awaiting-landing {
 }
 
 /* 메타버스(링아웃 월드): 서비스 이야기와 같은 블록 구성 */
-.story-metaverse-cta{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:64px 0 0;padding:32px 40px;background:var(--orange-soft);border:1px solid #f7d1bd;border-radius:16px}
-.story-metaverse-cta h3{font-size:22px;line-height:1.4;font-weight:700;margin:0 0 6px}.story-metaverse-cta p{margin:0;font-size:15px;line-height:1.6;color:var(--muted)}
-.story-metaverse-cta .primary{margin-top:0;flex-shrink:0;gap:24px}
 #panel-metaverse .world-introduction .story-stage-content>h2{font-size:clamp(26px,3vw,36px);line-height:1.4;margin:16px 0 24px;letter-spacing:-.03em}
 #panel-metaverse .service-story-block>h3{margin-bottom:16px}
 #panel-metaverse .world-introduction .story-stage-content>p:not(.story-emphasis),#panel-metaverse p.world-lead{max-width:760px;font-size:16px;line-height:1.9;color:var(--muted);word-break:keep-all}
@@ -398,3 +395,17 @@ body>.intro-character.world-guide .seed-drag-handle{pointer-events:auto;cursor:p
 /* 메타버스 탭은 씨앗이 무대에서 끝난다: 하단 마무리와 푸터를 숨기고 아래 여백을 없앤다. */
 body[data-chapter="metaverse"] :is(.closing,footer,.story>.inline-guide-copy){display:none}
 body[data-chapter="metaverse"] .story{padding-bottom:0}
+
+/* 서비스 이야기 하단: 광장 사진으로 시선을 끄는 메타버스 이동 카드 */
+.story-metaverse-cta{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);align-items:stretch;margin:64px 0 0;background:var(--orange-soft);border:1px solid #f7d1bd;border-radius:20px;overflow:hidden;box-shadow:0 12px 32px #f8794522}
+.story-metaverse-shot{position:relative;display:block;min-height:340px;overflow:hidden;background:#fbfaf6}
+.story-metaverse-shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 40%;transition:scale .5s cubic-bezier(.2,.7,.2,1)}
+.story-metaverse-shot:after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent 70%,#fff3ec)}
+.story-metaverse-cta:hover .story-metaverse-shot img{scale:1.04}
+.story-metaverse-copy{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:36px 36px 36px 28px}
+.story-metaverse-tag{margin:0 0 10px!important;padding:5px 12px;border-radius:999px;background:#fff;border:1px solid #f7d1bd;color:var(--orange-text)!important;font-size:13px!important;font-weight:700}
+.story-metaverse-cta h3{font-size:clamp(22px,2.4vw,28px);line-height:1.4;font-weight:700;margin:0 0 8px;word-break:keep-all}
+.story-metaverse-cta p{margin:0;font-size:15px;line-height:1.7;color:var(--muted);word-break:keep-all}
+.story-metaverse-cta .primary{margin-top:24px;gap:24px}
+@media(max-width:760px){.story-metaverse-cta{grid-template-columns:1fr;margin-top:40px}.story-metaverse-shot{min-height:0;aspect-ratio:16/9}.story-metaverse-shot:after{background:linear-gradient(180deg,transparent 70%,#fff3ec)}.story-metaverse-copy{padding:20px 24px 24px}.story-metaverse-cta .primary{width:100%;justify-content:space-between}}
+@media(prefers-reduced-motion:reduce){.story-metaverse-shot img{transition:none}.story-metaverse-cta:hover .story-metaverse-shot img{scale:1}}
